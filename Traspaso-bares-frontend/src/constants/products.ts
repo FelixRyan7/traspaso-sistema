@@ -1,0 +1,16 @@
+export const SUBCATEGORY_OPTIONS = [
+  { key: "all", label: "All" },
+  { key: "vodka", label: "Vodka" },
+  { key: "gin", label: "Gin" },
+  { key: "rum", label: "Rum" },
+  { key: "whisky", label: "Whisky" },
+  { key: "tequila", label: "Tequila" },
+  { key: "beer", label: "Beer" },
+  { key: "wine", label: "Wine" },
+  { key: "soda", label: "Soda" },
+  { key: "water", label: "Water" },
+  { key: "energy_drink", label: "Energy" },
+  { key: "coffee", label: "Coffee" },
+  { key: "cleaning", label: "Cleaning" },
+  { key: "ice", label: "Ice" },
+] as const;

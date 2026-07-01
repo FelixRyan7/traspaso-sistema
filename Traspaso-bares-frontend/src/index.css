@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200..900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer base {
+  /* Fuente global y números tabulares */
+  body  {
+    @apply font-sans text-base text-dark;
+    font-feature-settings: 'tnum'; 
+  }
+
+  h1 {
+    @apply text-3xl font-semibold tracking-tight;
+  }
+
+  h2 {
+    @apply text-2xl font-semibold tracking-tight;
+  }
+
+  h3 {
+    @apply text-xl font-medium;
+  }
+
+  h4 {
+    @apply text-lg font-medium;
+  }
+
+  h5 {
+    @apply text-base font-medium;
+  }
+
+  h6 {
+    @apply text-sm font-medium;
+  }
+
+  /* Texto normal */
+  p {
+    @apply text-base text-gray-dark;
+  }
+
+  /* Texto pequeño o caption */
+  small {
+    @apply text-sm text-gray-dark;
+  }
+
+  /* Links */
+  a {
+    @apply text-primary underline;
+  }
+}
