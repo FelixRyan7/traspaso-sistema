@@ -61,6 +61,7 @@ export default function LoginForm() {
     },
     onError: (error) => {
        const apiError = getApiError(error);
+       if ((error as any).isHandled) return;
       addAlert({
         id: Date.now(),
         type: "error",
