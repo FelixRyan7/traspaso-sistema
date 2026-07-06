@@ -106,7 +106,7 @@ export default function LocationRequestsPage() {
     </div>
     <div>
       <Button
-        onClick={() => navigate(`/workspace/locations/1/list`)}
+        onClick={() => navigate(`/workspace/locations/${locationId}/list`)}
         className="w-12 h-12 rounded-full flex items-center justify-center bg-primary text-white shadow-md hover:shadow-lg hover:scale-105 transition"
       >
          <AddCircleOutlineOutlinedIcon />
@@ -134,7 +134,7 @@ export default function LocationRequestsPage() {
       </div>
     )}
     
-    <div className="space-y-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {products.map(item => {
         const isRemoving = removingIds.includes(item.itemId);
 
