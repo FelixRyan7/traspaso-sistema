@@ -4,6 +4,7 @@ const { Session, User } = require("../models");
 const AppError = require('../helpers/AppError')
 const crypto = require("crypto")
 const { Op } = require("sequelize");
+require('dotenv').config();
 const {
   generateAccessToken,
 } = require("../helpers/jwt");
@@ -115,8 +116,9 @@ const login = async ({ username, password, userAgent, ip }) => {
   const accessToken = generateAccessToken(user);
   const refreshToken = crypto.randomBytes(64).toString("hex");;
 
+  const refreshExpiresDays = Number(process.env.REFRESH_EXPIRES_DAYS);
   const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 7);
+  expiresAt.setDate(expiresAt.getDate() + refreshExpiresDays);
 
   // REVOCAR sesiones anteriores (1 sesión por usuario para MVP)
   await Session.update(
