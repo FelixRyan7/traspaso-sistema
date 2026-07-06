@@ -1,6 +1,7 @@
 const AppError = require('../helpers/AppError');
 const authService = require('../services/auth.service')
 const Session = require("../models/Session");
+require('dotenv').config();
 
 const register = async (req, res) => {
   const { nombre, email, password } = req.body;
@@ -16,6 +17,8 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   const { username, password } = req.body;
+  console.log("LOGIN RECIBIDO");
+  
 
   const { accessToken, refreshToken, user, sessionId } =
     await authService.login({
@@ -25,18 +28,26 @@ const login = async (req, res) => {
       ip: req.ip,
     });
 
+  const refreshExpiresDays = Number(process.env.REFRESH_EXPIRES_DAYS);
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    sameSite:
+    process.env.NODE_ENV === "production"
+        ? "none"
+        : "lax",
+    maxAge: refreshExpiresDays * 24 * 60 * 60 * 1000,
   });
+  
 
   res.cookie("sessionId", sessionId, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    sameSite:
+    process.env.NODE_ENV === "production"
+        ? "none"
+        : "lax",
+    maxAge: refreshExpiresDays * 24 * 60 * 60 * 1000,
   });
 
   return res.status(200).json({
