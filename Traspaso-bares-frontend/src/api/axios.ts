@@ -1,6 +1,9 @@
 import axios from "axios";
 import { useAuthStore } from "../store/auth.store";
 import { queryClient } from "../lib/queryClient";
+import toast from "react-hot-toast";
+
+let rateLimitToastVisible = false;
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -30,8 +33,9 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     const errorCode = error.response?.data?.error?.code;
-    console.log("ERROR RAW:", error.response?.data);
-
+    if (import.meta.env.DEV) {
+      console.log("ERROR RAW:", error.response?.data);
+    }
     // SOLO si el token ha expirado
     if (
       error.response?.status === 401 &&
@@ -46,7 +50,6 @@ api.interceptors.response.use(
           {},
           { withCredentials: true }
         );
-        console.log("Refresh ok ")
         const { accessToken, user } = res.data;
 
         // guardar nuevo estado
@@ -59,7 +62,9 @@ api.interceptors.response.use(
         return api(originalRequest);
 
       } catch (refreshError) {
-        console.log(refreshError)
+        if (import.meta.env.DEV) {
+          console.log(refreshError)
+        }
 
         useAuthStore.getState().logout();
 
@@ -77,19 +82,37 @@ api.interceptors.response.use(
     ];
 
     if (authErrors.includes(errorCode)) {
-      console.log(errorCode)
+      if (import.meta.env.DEV) {
+        console.log(errorCode)
+      }
       try {
         await api.post("/auth/logout");
       } catch (e) {
-        console.log("logout backend failed", e);
+        if (import.meta.env.DEV) {
+          console.log("logout backend failed", e);
+        }
       }
 
       useAuthStore.getState().logout();
       queryClient.clear();
 }
-if (error.response?.status === 403 &&  window.location.pathname !== "/403") {
-  window.location.href = "/403";
-}
+    if (error.response?.status === 403 &&  window.location.pathname !== "/403") {
+       window.location.href = "/403";
+    }
+    if (errorCode === "RATE_LIMIT_EXCEEDED") {
+      if (!rateLimitToastVisible) {
+        rateLimitToastVisible = true;
+
+        toast.error(error.response.data.error.message);
+
+        setTimeout(() => {
+          rateLimitToastVisible = false;
+        }, 5000);
+      }
+
+      return Promise.reject(error);
+    }
+    
     return Promise.reject(error);
     
   }
