@@ -24,7 +24,6 @@ export const useLogin = () => {
     LoginData                 // variables input
   >({
     mutationFn: async (data) => {
-      console.log(data)
       const res = await api.post<LoginResponse>("/auth/login", data);
       return res.data;
     },
