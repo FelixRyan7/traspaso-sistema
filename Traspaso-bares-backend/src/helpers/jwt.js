@@ -8,7 +8,7 @@ const generateAccessToken = (user) => {
       companyId: user.companyId,
     },
     process.env.JWT_SECRET,
-    { expiresIn: "20m" }
+    { expiresIn: process.env.JWT_EXPIRES, }
   );
 };
 
