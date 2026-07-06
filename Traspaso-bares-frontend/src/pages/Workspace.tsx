@@ -1,3 +1,4 @@
+import { ErrorState } from "../components/ui/Alerts/ErrorState";
 import { Spinner } from "../components/ui/Loaders/Spinner";
 import { useDashboard } from "../hooks/useDashboard";
 import { useNavigate } from "react-router-dom";
@@ -9,7 +10,9 @@ export default function Workspace() {
 
   if (isLoading) return <div><Spinner/></div>;
 
-  if (error) return <p>Error cargando datos</p>;
+  if (error) {
+      return <ErrorState error={error} />;
+    }
    
   const handleLocationClick = (id: number) => {
     navigate(`/workspace/locations/${id}`);

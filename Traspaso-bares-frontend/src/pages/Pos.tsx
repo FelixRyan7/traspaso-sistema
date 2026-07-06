@@ -16,9 +16,10 @@ import { Spinner } from "../components/ui/Loaders/Spinner";
 import { useCreatePos } from "../hooks/PosHooks/useCreatePos";
 import type { LocationFormData } from "../schemas/createLocation.schema";
 import { getApiError } from "../api/apiError";
+import { ErrorState } from "../components/ui/Alerts/ErrorState";
 
 export default function Pos() {
-  const { data: locations = [], isLoading } = useLocations();
+  const { data: locations = [], isLoading, error } = useLocations();
   const { mutateAsync: createLocation, isPending } = useCreatePos();
   
 
@@ -75,6 +76,7 @@ export default function Pos() {
     </div>
     </>)
 
+  if (error) { return <ErrorState error={error} />; }
   return (
     <div className="p-6">
       {/* HEADER */}

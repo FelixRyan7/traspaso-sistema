@@ -10,6 +10,7 @@ import ChecklistOutlinedIcon from '@mui/icons-material/ChecklistOutlined';
 
 import { useLocationRequests } from "../hooks/orderHooks/useLocationRequests";
 import { Button } from "../components/ui/Buttons/Button";
+import { ErrorState } from "../components/ui/Alerts/ErrorState";
 
 export default function LocationPage() {
   const navigate = useNavigate()
@@ -21,7 +22,7 @@ export default function LocationPage() {
 
   if (isLoading) return <Spinner />;
 
-  if (error) return <p>{getApiError(error).message}</p>;
+  if (error) { return <ErrorState error={error} />; }
 
   return (
     <div className="p-6">
