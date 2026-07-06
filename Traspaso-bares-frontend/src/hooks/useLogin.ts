@@ -29,9 +29,6 @@ export const useLogin = () => {
     },
 
     onSuccess: (data) => {
-      console.log("Login exitoso:", data);
-      console.log("Usuario:", data.user);
-      console.log("AccessToken:", data.accessToken);
     },
 
     onError: (error) => {
