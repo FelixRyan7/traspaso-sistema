@@ -10,10 +10,14 @@ const productRoutes = require('./routes/products.routes');
 const locationRequestRoutes = require('./routes/locationRequest.routes');
 
 const app = express();
+app.set("trust proxy", 1);
 
 app.use(corsMiddleware);
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({
+  extended: true,
+  limit: "1mb",
+}));
 app.use(cookieParser());
 
 // 🌐 rutas públicas
