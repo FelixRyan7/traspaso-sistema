@@ -45,10 +45,6 @@ const createLocation = async (data, authUser) => {
 
   const { name, type } = data;
 
-  if (!name || name.trim() === "") {
-    throw new AppError("Name is required", "VALIDATION_ERROR", 400);
-  }
-
    const existing = await Location.findOne({
     where: {
       name,

@@ -1,7 +1,11 @@
 import { z } from "zod";
 
 export const productSchema = z.object({
-  name: z.string().min(1, "El nombre es obligatorio"),
+  name: z
+  .string()
+  .trim()
+  .min(1, "El nombre es obligatorio")
+  .max(30, "maximo 30 caracteres"),
 
   category: z.enum([
     "alcohol",

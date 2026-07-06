@@ -15,6 +15,7 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import { AlertList } from "../components/ui/Alerts/AlertList";
 import { Button } from "../components/ui/Buttons/Button";
 import { useWorkspaceLocation } from "../hooks/PosHooks/useLocation";
+import { ErrorState } from "../components/ui/Alerts/ErrorState";
 
 type ProductSummary = {
   productId: number;
@@ -79,7 +80,7 @@ export default function LocationRequestsPage() {
 
 
   if (isLoading) return <p>Cargando...</p>;
-  if (error) return <p>Error cargando órdenes</p>;
+  if (error) { return <ErrorState error={error} />; }
 
   return (
   <div className="p-4">

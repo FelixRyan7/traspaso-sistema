@@ -11,6 +11,7 @@ import { AlertList } from "../components/ui/Alerts/AlertList";
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined';
 import { useWorkspaceLocation } from "../hooks/PosHooks/useLocation";
+import { ErrorState } from "../components/ui/Alerts/ErrorState";
 
 
 
@@ -58,8 +59,7 @@ export default function LocationTodayDeliveriesPage() {
 };
 
   if (isLoading) return <Spinner />;
-  if (error) return <p>Error cargando entregas</p>;
-
+  if (error) { return <ErrorState error={error} />; }
   return (
     <div className="">
       <h3 className="text-dark mt-5 mb-2">Productos entregados a {location?.name}</h3>

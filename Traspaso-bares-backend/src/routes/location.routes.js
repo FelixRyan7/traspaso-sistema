@@ -3,7 +3,9 @@ const router = express.Router();
 
 const locationController = require('../controllers/location.controller');
 const asyncHandler = require('../middlewares/asyncHandler');
-const authMiddleware = require('../middlewares/auth.middleware')
+const authMiddleware = require('../middlewares/auth.middleware');
+const validate = require('../middlewares/validate.middleware');
+const locationSchema = require('../schemas/location.schema');
 
 
 router.get(
@@ -22,6 +24,7 @@ router.get(
 router.post(
   "/", 
   authMiddleware,
+  validate(locationSchema),
   asyncHandler(locationController.createLocation)
 );
 
