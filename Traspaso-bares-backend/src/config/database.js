@@ -9,7 +9,7 @@ const sequelize = new Sequelize(
     port: process.env.DB_PORT,
     dialect: 'mysql',
     logging: process.env.NODE_ENV === "development"
-      ? console.log
+      ? false
       : false,
     timezone: "+00:00",
     define: {
