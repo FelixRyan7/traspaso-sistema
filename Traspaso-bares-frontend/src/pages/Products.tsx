@@ -13,10 +13,11 @@ import { AlertList, type AlertMessage } from "../components/ui/Alerts/AlertList"
 import { getApiError } from "../api/apiError";
 import type { ProductFormData } from "../schemas/createProduct.schema";
 import { useLocations } from "../hooks/PosHooks/useLocations";
+import { ErrorState } from "../components/ui/Alerts/ErrorState";
 
 export default function Products() {
-  const { data: locations = [] } = useLocations();
-  const { data } = useAdminProducts();
+  const { data: locations = [], error: locationsError } = useLocations();
+  const { data,  error: productsError } = useAdminProducts();
  
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
@@ -71,6 +72,13 @@ export default function Products() {
     },
   });
   };
+
+
+  const error = productsError ?? locationsError;
+
+  if (error) {
+    return <ErrorState error={error} />;
+  }
   
   return (
     <div className="p-6">

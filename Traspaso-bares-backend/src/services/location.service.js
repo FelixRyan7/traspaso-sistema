@@ -45,10 +45,6 @@ const createLocation = async (data, authUser) => {
 
   const { name, type } = data;
 
-  if (!name || name.trim() === "") {
-    throw new AppError("Name is required", "VALIDATION_ERROR", 400);
-  }
-
    const existing = await Location.findOne({
     where: {
       name,
@@ -69,6 +65,47 @@ const createLocation = async (data, authUser) => {
     type: type || "bar",
     companyId: authUser.companyId,
     isActive: true,
+  });
+
+  return location;
+};
+
+const updateLocation = async (id, data, authUser) => {
+  if (!authUser?.companyId) {
+    throw new AppError("Company not found", "NO_COMPANY", 400);
+  }
+
+  const location = await Location.findOne({
+    where: {
+      id,
+      companyId: authUser.companyId,
+    },
+  });
+
+  if (!location) {
+    throw new AppError("POS no encontrado", "LOCATION_NOT_FOUND", 404);
+  }
+
+  const { name, type } = data;
+
+  const existing = await Location.findOne({
+    where: {
+      name,
+      companyId: authUser.companyId,
+    },
+  });
+
+  if (existing && existing.id !== location.id) {
+    throw new AppError(
+      "Ya existe un POS con este nombre",
+      "DUPLICATED_LOCATION",
+      409
+    );
+  }
+
+  await location.update({
+    name,
+    type,
   });
 
   return location;
@@ -157,6 +194,7 @@ module.exports = {
   getLocationsByCompany,
   getLocationById,
   createLocation,
+  updateLocation,
   toggleLocation,
   getLocationProducts
 };

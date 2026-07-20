@@ -1,5 +1,7 @@
+require('dotenv').config();
 const app = require('./app');
 const sequelize = require('./config/database'); // 👈 IMPORTANTE
+
 
 require('./models/User');
 
@@ -12,7 +14,7 @@ async function start() {
     await sequelize.sync();
 
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      console.log(`🚀 Server running on port ${PORT}`);
     });
 
   } catch (error) {

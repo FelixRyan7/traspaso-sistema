@@ -12,6 +12,7 @@ import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined';
 import SubcategoryFilter from "../components/ui/Filters/SubcategoryFilter";
 import SearchBar from "../components/ui/Filters/SearchBar";
 import { SUBCATEGORY_OPTIONS } from "../constants/products";
+import { ErrorState } from "../components/ui/Alerts/ErrorState";
 
 export default function LocationDirectDeliverPage() {
   const { locationId } = useParams();
@@ -62,7 +63,7 @@ export default function LocationDirectDeliverPage() {
   };
 
   if (isLoading) return <p>Cargando...</p>;
-  if (error) return <p>Error cargando productos</p>;
+  if (error) { return <ErrorState error={error} />; }
 
   return (
     <div className="p-4 space-y-4">

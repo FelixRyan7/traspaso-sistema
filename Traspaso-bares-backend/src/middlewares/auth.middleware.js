@@ -1,5 +1,5 @@
-const jwt = require("jsonwebtoken");
 const AppError = require("../helpers/AppError");
+const { verifyAccessToken } = require("../helpers/jwt");
 
 const authMiddleware = (req, res, next) => {
   try {
@@ -15,52 +15,35 @@ const authMiddleware = (req, res, next) => {
 
     const token = authHeader.split(" ")[1];
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = verifyAccessToken(token);
 
     req.user = decoded;
 
     next();
 
   } catch (error) {
-    console.error("[AUTH_MIDDLEWARE_ERROR]", error);
+   if (process.env.NODE_ENV !== "production") {
+    console.error("[AUTH]", error);
+}
     
-    // 🟡 TOKEN EXPIRADO → hacemos refresh
-    if (error.name === "TokenExpiredError") {
-      return res.status(401).json({
-        error: {
-          code: "TOKEN_EXPIRED",
-          message: "Tu sesión ha expirado",
-        },
-      });
+    if(error.name==="TokenExpiredError"){
+      new AppError(
+          "Tu sesión ha expirado",
+          "TOKEN_EXPIRED",
+          401
+      );
     }
 
     // 🔴 TOKEN ALTERADO o FIRMA INVALIDA
-    if (error.name === "JsonWebTokenError") {
-      return res.status(401).json({
-        error: {
-          code: "INVALID_TOKEN",
-          message: "Token inválido",
-        },
-      });
+    if(error.name==="JsonWebTokenError"){
+      new AppError(
+          "Token inválido",
+          "INVALID_TOKEN",
+          401
+      );
     }
 
-    // 🟠 ERRORES CONTROLADOS DE APP
-    if (error instanceof AppError) {
-      return res.status(error.status).json({
-        error: {
-          code: error.code,
-          message: error.message,
-        },
-      });
-    }
-
-    // 🔥 ERROR INESPERADO (fallback seguro)
-    return res.status(500).json({
-      error: {
-        code: "INTERNAL_ERROR",
-        message: "Error interno del servidor",
-      },
-    });
+   return next(error);
   }
 };
 

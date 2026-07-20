@@ -24,15 +24,11 @@ export const useLogin = () => {
     LoginData                 // variables input
   >({
     mutationFn: async (data) => {
-      console.log(data)
       const res = await api.post<LoginResponse>("/auth/login", data);
       return res.data;
     },
 
     onSuccess: (data) => {
-      console.log("Login exitoso:", data);
-      console.log("Usuario:", data.user);
-      console.log("AccessToken:", data.accessToken);
     },
 
     onError: (error) => {

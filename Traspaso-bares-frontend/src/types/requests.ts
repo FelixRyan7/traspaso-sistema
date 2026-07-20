@@ -1,4 +1,4 @@
-export type LocationRequestWithProduct = LocationRequest & {
+export type  = LocationRequest & {
   product: {
     id: number;
     name: string;
@@ -16,6 +16,7 @@ export type LocationRequest = {
   productId: number;
   quantity: number;
   status: "pending" | "delivered";
+  date: string;
   deliveredAt: string | null;
   userId: number | null;
   createdAt: string;

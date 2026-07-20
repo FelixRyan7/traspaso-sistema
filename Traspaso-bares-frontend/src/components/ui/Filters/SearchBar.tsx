@@ -5,7 +5,7 @@ type Props = {
 
 export default function SearchBar({ value, onChange }: Props) {
   return (
-    <div className="sticky top-0 bg-white-soft z-10 pb-2">
+    <div className="sticky top-0 bg-white-soft z-10">
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}

@@ -8,12 +8,12 @@ import { useCreateLocationRequest } from "../hooks/orderHooks/useCreateLocationR
 import DoneOutlinedIcon from '@mui/icons-material/DoneOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import { useAlerts } from "../hooks/alerts/useAlerts";
-import { getApiError } from "../api/apiError";
 import { useLocationRequests } from "../hooks/orderHooks/useLocationRequests";
 import SubcategoryFilter from "../components/ui/Filters/SubcategoryFilter";
 import SearchBar from "../components/ui/Filters/SearchBar";
 import { SUBCATEGORY_OPTIONS } from "../constants/products";
 import { useWorkspaceLocation } from "../hooks/PosHooks/useLocation";
+import { ErrorState } from "../components/ui/Alerts/ErrorState";
 
 export default function LocationListPage() {
   const { locationId } = useParams();
@@ -85,7 +85,7 @@ export default function LocationListPage() {
     };
 
   if (isLoading) return <p>Cargando...</p>;
-  if (error) return <p>{getApiError(error).message}</p>;
+  if (error) { return <ErrorState error={error} />; }
 
   return (
     <div className="p-4 space-y-4">
