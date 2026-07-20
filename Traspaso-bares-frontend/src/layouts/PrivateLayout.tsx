@@ -10,7 +10,7 @@ export default function PrivateLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-white/20">
+    <div className="flex h-screen overflow-hidden bg-white/80">
       
       {/* SIDEBAR */}
       <Sidebar />
@@ -22,7 +22,7 @@ export default function PrivateLayout() {
       />
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 flex flex-col overflow-hidden pb-12">
 
         <PrivateHeader setMobileOpen={setMobileOpen} />
         
