@@ -1,8 +1,9 @@
 const { Location, LocationRequest, Product } = require("../models");
 const AppError = require("../helpers/AppError");
 const { assertCompanyAccess } = require("../helpers/assertCompanyAccess");
+const { Op, fn, col } = require("sequelize");
 
-
+// Find delivered or pending transfers by status and date 
 const getLocationRequests = async (locationId, user, filters = {}) => {
   const location = await Location.findOne({
     where: {
@@ -41,6 +42,121 @@ const getLocationRequests = async (locationId, user, filters = {}) => {
     ],
     order: [["createdAt", "DESC"]],
   });
+};
+
+// Find delivered transfers by date
+const getLocationTransfersByDate = async (
+  locationId,
+  user,
+  filters
+) => {
+
+  const {from, to} = filters;
+
+  const location = await Location.findOne({
+    where: {
+      id: locationId,
+      companyId: user.companyId,
+    },
+  });
+
+  if (!location) {
+    throw new AppError(
+      "LOCATION_NOT_FOUND",
+      "Location no encontrado",
+      404
+    );
+  }
+
+  return await LocationRequest.findAll({
+    where: {
+      locationId,
+      status: "delivered",
+      date: {
+        [Op.between]: [from, to],
+      },
+    },
+
+    include: [
+      {
+        model: Product,
+        as: "product",
+      },
+    ],
+
+    order: [["date", "DESC"]],
+  });
+};
+
+const getLocationTransfersSummary = async (
+  locationId,
+  user,
+  filters
+) => {
+
+  const { from, to } = filters;
+
+  const location = await Location.findOne({
+    where: {
+      id: locationId,
+      companyId: user.companyId,
+    },
+  });
+
+  if (!location) {
+    throw new AppError(
+      "LOCATION_NOT_FOUND",
+      "Location no encontrado",
+      404
+    );
+  }
+
+  const summary = await LocationRequest.findAll({
+
+    where: {
+      locationId,
+      status: "delivered",
+      date: {
+        [Op.between]: [from, to],
+      },
+    },
+
+    attributes: [
+      "productId",
+      [fn("SUM", col("LocationRequest.quantity")), "totalQuantity"],
+    ],
+
+    include: [
+      {
+        model: Product,
+        as: "product",
+        attributes: ["id", "name", "quantity", "quantityUnit","unitType"],
+      },
+    ],
+
+    group: [
+      "LocationRequest.productId",
+      "product.id",
+      "product.name",
+      "product.quantity",
+      "product.quantityUnit",
+      "product.unitType",
+    ],
+
+    order: [
+      [fn("SUM", col("LocationRequest.quantity")), "DESC"],
+    ],
+    
+  });
+  return summary.map((item) => ({
+  productId: item.productId,
+  productName: item.product.name,
+  quantity: item.product.quantity,
+  quantityUnit: item.product.quantityUnit,
+  unitType: item.product.unitType,
+  totalQuantity: Number(item.get("totalQuantity")),
+}));
+  
 };
 
 // ADD item (upsert lógico)
@@ -222,6 +338,8 @@ const updateLocationDeliveredRequest = async (id, user, data) => {
 
 module.exports = {
   getLocationRequests,
+  getLocationTransfersByDate,
+  getLocationTransfersSummary,
   addItem,
   deliverRequest,
   createDirectDelivery,
