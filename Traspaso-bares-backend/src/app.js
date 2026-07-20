@@ -24,6 +24,7 @@ app.use(express.urlencoded({
   extended: true,
   limit: "1mb",
 }));
+
 app.use(cookieParser());
 
 // 🌐 rutas públicas
@@ -34,7 +35,6 @@ app.use('/api/dashboard', dashboardRoutes)
 app.use('/api/locations', locationRoutes)
 app.use('/api/locationRequests', locationRequestRoutes)
 app.use('/api/admin/products', productRoutes)
-
 
 app.get('/', (req, res) => {
   res.json({ message: 'API funcionando 🚀' });
