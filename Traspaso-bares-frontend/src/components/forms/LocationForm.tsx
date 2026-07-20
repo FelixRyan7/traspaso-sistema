@@ -11,6 +11,8 @@ import Modal from "../modals/Modal";
 import InputFloatingRHF from "../ui/Inputs/FloatingInput";
 import { Button } from "../ui/Buttons/Button";
 import { Spinner } from "../ui/Loaders/Spinner";
+import { useEffect } from "react";
+import type { Location } from "../../types/location";
 
 type Props = {
   open: boolean;
@@ -19,6 +21,7 @@ type Props = {
     data: LocationFormData
   ) => Promise<void>;
   isPending: boolean;
+  location?: Location;
 };
 
 export default function LocationModalForm({
@@ -26,6 +29,7 @@ export default function LocationModalForm({
   onClose,
   onSubmitLocation,
   isPending,
+  location
 }: Props) {
   const {
     register,
@@ -36,6 +40,20 @@ export default function LocationModalForm({
   } = useForm<LocationFormData>({
     resolver: zodResolver(locationSchema),
   });
+
+  useEffect(() => {
+  if (location) {
+    reset({
+      name: location.name,
+      type: location.type,
+    });
+  } else {
+    reset({
+      name: "",
+      type: "bar",
+    });
+  }
+}, [location, reset]);
 
   const handleFormSubmit = async (
     data: LocationFormData
@@ -107,19 +125,21 @@ export default function LocationModalForm({
           ]}
         />
 
-        <Button
-          type="submit"
-          disabled={isPending}
-        >
-          {isPending ? (
-            <>
-              <Spinner bg="gray-dark" />
-              Guardando...
-            </>
-          ) : (
-            "Crear POS"
-          )}
-        </Button>
+      <Button
+        type="submit"
+        disabled={isPending}
+      >
+        {isPending ? (
+          <>
+            <Spinner bg="gray-dark" />
+            Guardando...
+          </>
+        ) : location ? (
+          "Guardar cambios"
+        ) : (
+          "Crear POS"
+        )}
+      </Button>
       </form>
     </Modal>
   );
