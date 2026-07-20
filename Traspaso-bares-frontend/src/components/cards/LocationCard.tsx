@@ -2,28 +2,27 @@ import MoreVertOutlinedIcon from "@mui/icons-material/MoreVertOutlined";
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 
 import { useState } from "react";
-import { useTogglePos } from "../../hooks/PosHooks/useTogglePos";
+import type { Location } from "../../types/location";
+import LocationCardMenu from "../menus/LocationCardMenu";
 
 type Props = {
-  location: any;
+  location: Location;
+  onEdit: (location: Location) => void;
 };
 
-export default function LocationCard({ location }: Props) {
+export default function LocationCard({ location, onEdit }: Props) {
   const [openMenu, setOpenMenu] = useState(false);
-
-  const { mutate: togglePos, isPending } = useTogglePos();
 
   return (
     <div
-      className="
-        relative rounded-2xl
-        bg-white/80 backdrop-blur-md
-        border border-gray-light/60
+      className={`relative rounded-2xl
+        ${openMenu ? "z-50" : ""}
+        bg-white-soft
         p-5 shadow-sm
         transition-all duration-200
-        hover:shadow-md hover:-translate-y-0.5
-      "
+        hover:shadow-md `}      
     >
+
       {/* ACTIONS */}
       <div className="absolute top-3 right-3">
         <button
@@ -39,37 +38,16 @@ export default function LocationCard({ location }: Props) {
 
         {openMenu && (
           <>
-            {/* BACKDROP */}
             <div
               className="fixed inset-0 z-10"
               onClick={() => setOpenMenu(false)}
             />
 
-            {/* MENU */}
-            <div
-              className="
-                absolute right-0 mt-2 z-20
-                w-44
-                bg-white/90 backdrop-blur-md
-                border border-gray-light/60
-                rounded-xl
-                shadow-lg
-                overflow-hidden
-              "
-            >
-              <button
-                onClick={() => togglePos(location.id)}
-                disabled={isPending}
-                className="
-                  w-full text-left px-4 py-2
-                  text-sm
-                  hover:bg-gray-light/50
-                  transition
-                "
-              >
-                {isPending ? "Actualizando..." : location.isActive ? "Desactivar" : "Activar"}
-              </button>
-            </div>
+            <LocationCardMenu
+              location={location}
+              onEdit={onEdit}
+              onClose={() => setOpenMenu(false)}
+            />
           </>
         )}
       </div>

@@ -13,6 +13,7 @@ import LocationListPage from "../pages/LocationListPage";
 import LocationRequestsPage from "../pages/LocationRequestsPage";
 import LocationDeliverPage from "../pages/LocationDeliverPage";
 import LocationDailyDeliveries from "../pages/LocationTodayDeliveriesPage";
+import TransfersPage from "../pages/TransfersPage";
 
 
 
@@ -34,6 +35,14 @@ export default function Router() {
                 <Products />
               </RoleGuard>
              } />
+            <Route
+              path="transfers"
+              element={
+                <RoleGuard allowedRoles={["admin", "manager"]}>
+                  <TransfersPage />
+                </RoleGuard>
+              }
+            />
              <Route path="admin/pos" element={
               <RoleGuard allowedRoles={["admin", "manager"]}>
                 <Pos />

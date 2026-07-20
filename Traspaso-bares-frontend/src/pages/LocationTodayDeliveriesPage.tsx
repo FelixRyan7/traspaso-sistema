@@ -12,6 +12,8 @@ import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined
 import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined';
 import { useWorkspaceLocation } from "../hooks/PosHooks/useLocation";
 import { ErrorState } from "../components/ui/Alerts/ErrorState";
+import { Button } from "../components/ui/Buttons/Button";
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 
 
 
@@ -62,6 +64,7 @@ export default function LocationTodayDeliveriesPage() {
   if (error) { return <ErrorState error={error} />; }
   return (
     <div className="">
+      <Button to={`/workspace/locations/${locationId}`}><ArrowBackIosIcon/></Button>
       <h3 className="text-dark mt-5 mb-2">Productos entregados a {location?.name}</h3>
       <div className="border border-gray-light/40 mb-6" />
       <div className="space-y-2">

@@ -25,7 +25,7 @@ export default function Workspace() {
       <div
         key={location.id}
         onClick={() => handleLocationClick(location.id)}
-        className="group p-5 rounded-xl border border-gray-light bg-white-soft shadow-sm hover:shadow-md transition-all cursor-pointer"
+        className="group p-5 rounded-xl  bg-white-soft shadow-sm hover:shadow-md transition-all cursor-pointer"
       >
         <div className="flex items-center justify-between">
           <h3 className="text-dark font-semibold text-lg">

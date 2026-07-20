@@ -17,6 +17,42 @@ const getLocationRequests = async (req, res) => {
   res.json(items);
 };
 
+// Find trasnfers by date and location
+const getLocationTransfersByDate = async (req, res) => {
+  const { locationId, from, to } = req.query;
+   
+
+  const transfers =
+    await locationRequestService.getLocationTransfersByDate(
+      Number(locationId),
+      req.user,
+      {
+        from,
+        to,
+      }
+    );
+
+  res.json(transfers);
+};
+
+// Find total quantity per product by date
+const getLocationTransfersSummary = async (req, res) => {
+  
+  const { locationId, from, to } = req.query;
+
+  const summary =
+    await locationRequestService.getLocationTransfersSummary(
+      Number(locationId),
+      req.user,
+      {
+        from,
+        to,
+      }
+    );
+
+  res.json(summary);
+};
+
 const addItem = async (req, res) => {
   try {
     const { locationId } = req.params;
@@ -74,6 +110,8 @@ const updateLocationDeliveredRequest = async (req, res) => {
 
 module.exports = {
   getLocationRequests,
+  getLocationTransfersByDate,
+  getLocationTransfersSummary,
   addItem,
   deliverRequest,
   createDirectDelivery,

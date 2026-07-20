@@ -8,7 +8,6 @@ import { useCreateLocationRequest } from "../hooks/orderHooks/useCreateLocationR
 import DoneOutlinedIcon from '@mui/icons-material/DoneOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import { useAlerts } from "../hooks/alerts/useAlerts";
-import { getApiError } from "../api/apiError";
 import { useLocationRequests } from "../hooks/orderHooks/useLocationRequests";
 import SubcategoryFilter from "../components/ui/Filters/SubcategoryFilter";
 import SearchBar from "../components/ui/Filters/SearchBar";

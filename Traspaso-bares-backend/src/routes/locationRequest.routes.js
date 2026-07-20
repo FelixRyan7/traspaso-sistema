@@ -2,12 +2,24 @@ const express = require("express");
 const router = express.Router();
 
 const locationRequestController = require("../controllers/locationRequest.controller");
-
 const asyncHandler = require("../middlewares/asyncHandler");
 const authMiddleware = require("../middlewares/auth.middleware");
 const requireRoles = require("../middlewares/requireRoles");
 
 
+router.get(
+  "/transfers/summary",
+  authMiddleware,
+  requireRoles("admin", "manager"),
+  asyncHandler(locationRequestController.getLocationTransfersSummary)
+);
+
+router.get(
+  "/transfers",
+  authMiddleware,
+  requireRoles("admin", "manager"),
+  asyncHandler(locationRequestController.getLocationTransfersByDate)
+);
 
 // obtener lista del día
 router.get(
@@ -16,6 +28,7 @@ router.get(
   requireRoles('admin', 'manager', 'staff'),
   asyncHandler(locationRequestController.getLocationRequests)
 );
+
 
 // añadir movimiento
 router.post(

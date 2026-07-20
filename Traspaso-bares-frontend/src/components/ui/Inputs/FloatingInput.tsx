@@ -1,3 +1,4 @@
+import type { ChangeEvent } from "react";
 import type { UseFormRegisterReturn } from "react-hook-form";
 
 type Option = {
@@ -10,12 +11,15 @@ type InputFloatingRHFProps = {
   label: string;
   type?: string;
   icon?: React.ReactNode;
-  register: UseFormRegisterReturn;
+  register?: UseFormRegisterReturn;
   error?: string;
   value?: string | number;
+  onChange?: (value: string) => void;
   list?: string;
   options?: Option[];
   disabled?: boolean;
+  min?: string | number;
+  max?: string | number;
 };
 
 export default function InputFloatingRHF({
@@ -26,10 +30,21 @@ export default function InputFloatingRHF({
   register,
   error,
   value,
+  onChange,
   list,
   options = [],
   disabled = false,
+  min,
+  max,
 }: InputFloatingRHFProps) {
+  if (
+    register &&
+    (value !== undefined || onChange)
+  ) {
+    console.warn(
+      `InputFloatingRHF (${id}): no combines 'register' con 'value/onChange'. Usa uno u otro.`
+    );
+  }
   const isFilled =
   value !== undefined &&
   value !== null &&
@@ -37,6 +52,22 @@ export default function InputFloatingRHF({
   const isDateInput = type === "date";
   const isSelectInput = type === "select";
   const hasIcon = !!icon;
+
+  const controlledInputProps = register
+    ? register
+    : {
+        value: value ?? "",
+        onChange: (e: ChangeEvent<HTMLInputElement>) =>
+          onChange?.(e.target.value),
+      };
+
+  const controlledSelectProps = register
+    ? register
+    : {
+        value: value ?? "",
+        onChange: (e: ChangeEvent<HTMLSelectElement>) =>
+          onChange?.(e.target.value),
+      };
 
   return (
     <div className=" flex flex-col w-full relative min-h-[90px]">
@@ -63,7 +94,7 @@ export default function InputFloatingRHF({
         {type === "select" ? (
           <select
             id={id}
-            {...register}
+            {...controlledSelectProps}
             disabled={disabled}
             className="peer flex-1 p-3 bg-transparent outline-none text-base"
           >
@@ -80,7 +111,9 @@ export default function InputFloatingRHF({
             type={type}
             list={list}
             placeholder=" " 
-            {...register}
+            {...controlledInputProps}
+             min={min}
+             max={max}
             disabled={disabled}
             className="peer flex-1 p-3 bg-transparent outline-none text-base"
           />

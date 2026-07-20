@@ -3,7 +3,7 @@ import { Spinner } from "../Loaders/Spinner";
 import { Link } from "react-router-dom";
 // Componente para renderizar botones por variantes(colores y estilos), funciones(onClick), estados(disabled, loading...) o tipos(submit, button...)
 
-type Variant = "primary" | "white" | "secondary" | "outline" | "ghost" | "danger";
+type Variant = "primary" | "white" | "secondary" | "outline" | "ghost" | "danger" | "plain";
 type Radius = "md" | "full";
 
 type ButtonProps = {
@@ -24,6 +24,7 @@ const variants: Record<Variant, string> = {
   secondary: "bg-gray text-white hover:bg-gray-dark",
   outline: "border border-primary text-primary hover:bg-primary hover:text-white",
   ghost: "text-primary hover:text-primary-strong hover:bg-primary-soft",
+  plain: "text-dark hover:text-primary-strong hover:bg-primary-soft",
   danger: "bg-error text-white hover:bg-error-strong",
 };
 const disabledStyles =

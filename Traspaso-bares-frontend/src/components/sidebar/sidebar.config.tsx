@@ -1,6 +1,7 @@
 import SpaceDashboardOutlinedIcon from "@mui/icons-material/SpaceDashboardOutlined";
 import FastfoodOutlinedIcon from "@mui/icons-material/FastfoodOutlined";
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
+import ViewModuleOutlinedIcon from '@mui/icons-material/ViewModuleOutlined';
 
 export type SidebarItem = {
   label: string;
@@ -23,9 +24,15 @@ export const sidebarItems: SidebarItem[] = [
     roles: ["admin", "manager"],
   },
   {
-    label: "Puntos De Venta",
+    label: "Ubicaciones",
     to: "/workspace/admin/pos",
     icon: <StorefrontOutlinedIcon  />,
+    roles: ["admin", "manager"],
+  },
+  {
+    label: "Transfers",
+    to: "/workspace/transfers",
+    icon: <ViewModuleOutlinedIcon  />,
     roles: ["admin", "manager"],
   },
 ];
