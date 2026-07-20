@@ -28,6 +28,8 @@ router.post(
   asyncHandler(locationController.createLocation)
 );
 
+router.put("/:id", authMiddleware, asyncHandler(locationController.updateLocation));
+
 router.patch(
   "/:id/toggle",
   authMiddleware,
