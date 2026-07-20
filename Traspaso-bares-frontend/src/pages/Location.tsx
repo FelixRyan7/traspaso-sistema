@@ -27,7 +27,7 @@ export default function LocationPage() {
   return (
     <div className="p-6">
       
-      <h1 className="text-2xl font-bold">{data?.name}</h1>
+      <h2 className="text-2xl font-bold mb-3">{data?.name}</h2>
 
       <p className="text-gray">{data?.type}</p>
       

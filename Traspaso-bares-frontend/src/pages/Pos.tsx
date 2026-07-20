@@ -17,37 +17,75 @@ import { useCreatePos } from "../hooks/PosHooks/useCreatePos";
 import type { LocationFormData } from "../schemas/createLocation.schema";
 import { getApiError } from "../api/apiError";
 import { ErrorState } from "../components/ui/Alerts/ErrorState";
+import type { Location } from "../types/location";
+import { useUpdateLocation } from "../hooks/PosHooks/useUpdateLocation";
 
 export default function Pos() {
   const { data: locations = [], isLoading, error } = useLocations();
-  const { mutateAsync: createLocation, isPending } = useCreatePos();
+  const { mutateAsync: createLocation, isPending: creating } = useCreatePos();
+  const { mutateAsync: updateLocation, isPending: updating } = useUpdateLocation();
+  const isPending = creating || updating;
+  const [editingLocation, setEditingLocation] = useState<Location | undefined>(undefined);
   
 
   const handleSubmitLocation = async (data: LocationFormData) => {
-  createLocation(data, {
-    onSuccess: () => {
-      addAlert({
-        id: Date.now(),
-        type: "success",
-        icon: <CheckCircleOutlineOutlinedIcon />,
-        content: "POS creado correctamente",
-      });
+  if (editingLocation) {
+    await updateLocation(
+      {
+        id: editingLocation.id,
+        data,
+      },
+      {
+        onSuccess: () => {
+          addAlert({
+            id: Date.now(),
+            type: "success",
+            icon: <CheckCircleOutlineOutlinedIcon />,
+            content: "POS actualizado correctamente",
+          });
 
-      setOpen(false);
-    },
+          setOpen(false);
+          setEditingLocation(undefined);
+        },
 
-    onError: (err: any) => {
-      const apiError = getApiError(err);
+        onError: (err: any) => {
+          const apiError = getApiError(err);
 
-      addAlert({
-        id: Date.now(),
-        type: "error",
-        icon: <ErrorOutlineOutlinedIcon />,
-        content: apiError.message,
-      });
-    },
-  });
-  };
+          addAlert({
+            id: Date.now(),
+            type: "error",
+            icon: <ErrorOutlineOutlinedIcon />,
+            content: apiError.message,
+          });
+        },
+      }
+    );
+  } else {
+    await createLocation(data, {
+      onSuccess: () => {
+        addAlert({
+          id: Date.now(),
+          type: "success",
+          icon: <CheckCircleOutlineOutlinedIcon />,
+          content: "POS creado correctamente",
+        });
+
+        setOpen(false);
+      },
+
+      onError: (err: any) => {
+        const apiError = getApiError(err);
+
+        addAlert({
+          id: Date.now(),
+          type: "error",
+          icon: <ErrorOutlineOutlinedIcon />,
+          content: apiError.message,
+        });
+      },
+    });
+  }
+};
 
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -88,7 +126,10 @@ export default function Pos() {
         </div>
 
         <Button
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            setEditingLocation(undefined);
+            setOpen(true);
+          }}
         >
           Add POS
         </Button>
@@ -124,6 +165,10 @@ export default function Pos() {
         {filteredLocations.map((location: any) => (
           <LocationCard
             key={location.id}
+            onEdit={(location) => {
+              setEditingLocation(location);
+              setOpen(true);
+            }}
             location={location}
           />
         ))}
@@ -135,6 +180,7 @@ export default function Pos() {
         onClose={() => setOpen(false)}
         onSubmitLocation={handleSubmitLocation}
         isPending={isPending}
+        location={editingLocation}
       />
     </div>
   );
