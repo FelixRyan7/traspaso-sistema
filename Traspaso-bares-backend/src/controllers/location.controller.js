@@ -26,6 +26,16 @@ const createLocation = async (req, res) => {
   return res.status(201).json(location);
 };
 
+const updateLocation = async (req, res) => {
+  const location = await locationService.updateLocation(
+    req.params.id,
+    req.body,
+    req.user
+  );
+
+  return res.json(location);
+};
+
 const toggleLocation = async (req, res) => {
   const updated = await locationService.toggleLocation(
     req.params.id,
@@ -51,5 +61,6 @@ module.exports = {
   getLocationById,
   createLocation,
   toggleLocation,
+  updateLocation,
   getLocationProducts
 };
