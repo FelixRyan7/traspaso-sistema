@@ -11,14 +11,12 @@ export default function PrivateHeader({setMobileOpen}: Props) {
 
 
   return (
-    <header className="sticky top-0 z-40
-      h-20 md:h-14
+    <header className="
+      h-20 md:h-18
       flex items-center justify-between
-      px-2
-      bg-white-soft
+      px-2 
       backdrop-blur-xl
-      mx-3
-      shadow-sm">
+      ">
 
       {/* LEFT */}
       <div className="flex items-center">
@@ -29,7 +27,7 @@ export default function PrivateHeader({setMobileOpen}: Props) {
           <MenuIcon fontSize="large"/>
         </button>
        
-        <h1 className="hidden md:flex text-lg font-semibold text-dark">
+        <h1 className="hidden md:flex text-lg md:ml-10 font-semibold text-dark">
           Hola {user?.name}!
         </h1>
       </div>
