@@ -3,6 +3,7 @@ import type { Location } from "../../types/location";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   location: Location;
@@ -12,6 +13,7 @@ type Props = {
 
 export default function LocationCardMenu({ location, onClose, onEdit }: Props) {
   const { mutate: togglePos, isPending } = useTogglePos();
+  const navigate = useNavigate()
 
   return (
     <div
@@ -28,7 +30,7 @@ export default function LocationCardMenu({ location, onClose, onEdit }: Props) {
       <button
         onClick={() => {
           onClose();
-          // navigate(...)
+          navigate(`/workspace/transfers?locationId=${location.id}`);
         }}
         className="flex items-center gap-3 w-full px-4 py-3 text-sm hover:bg-gray-light/50 transition"
       >

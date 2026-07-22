@@ -2,9 +2,10 @@ import type { AxiosError } from "axios";
 import type { ApiError } from "../../types/api";
 import type { TransferSummaryItem } from "../../types/transfers";
 import { formatSpanishDate } from "../../helpers/formatSpanishDate";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import SearchBar from "../ui/Filters/SearchBar";
 import CheckIcon from "@mui/icons-material/Check";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
@@ -15,6 +16,7 @@ type Props = {
   from: string;
   to:string;
   selectedProductIds: number[];
+  deliveredUnits: number;
 
   onProductSelect: (ids: number[]) => void;
   onClearFilter: () => void;
@@ -27,9 +29,52 @@ export default function TransferSummary({
   from,
   to,
   selectedProductIds,
+  deliveredUnits,
   onProductSelect,
   onClearFilter
 }: Props) {
+
+  const [showScrollHint, setShowScrollHint] = useState(false);
+
+  const totalProducts = summary.length;
+
+  const [search, setSearch] = useState("");
+
+  const filteredSummary = useMemo(() => {
+  const term = search.trim().toLowerCase();
+
+  if (!term) return summary;
+
+  return summary.filter((item) =>
+    item.productName.toLowerCase().includes(term)
+  );
+  }, [summary, search]);
+
+  const listRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const list = listRef.current;
+
+    if (!list) return;
+
+    const updateHint = () => {
+      const hasOverflow = list.scrollHeight > list.clientHeight;
+      const isAtTop = list.scrollTop < 10;
+
+      setShowScrollHint(hasOverflow && isAtTop);
+    };
+
+    updateHint();
+
+    list.addEventListener("scroll", updateHint);
+    window.addEventListener("resize", updateHint);
+
+    return () => {
+      list.removeEventListener("scroll", updateHint);
+      window.removeEventListener("resize", updateHint);
+    };
+  }, [filteredSummary]);
+
 
   if (loading) {
     return (
@@ -49,23 +94,7 @@ export default function TransferSummary({
 
   if (!summary.length) return null;
 
-  const totalProducts = summary.length;
-
-  const totalUnits = summary.reduce(
-    (acc, item) => acc + Number(item.totalQuantity),
-    0
-  );
-  const [search, setSearch] = useState("");
-
-  const filteredSummary = useMemo(() => {
-  const term = search.trim().toLowerCase();
-
-  if (!term) return summary;
-
-  return summary.filter((item) =>
-    item.productName.toLowerCase().includes(term)
-  );
-}, [summary, search]);
+  
 
 
 return (
@@ -88,28 +117,28 @@ return (
 
         </div>
 
-        <div className="grid grid-cols-2 gap-3 p-2">
+        <div className="grid grid-cols-2 gap-3 p-2 mt-1">
 
-            <div className="rounded-2xl bg-success-soft p-3">
+            <div className={`rounded-2xl p-3 ${selectedProductIds.length > 0 ? "bg-primary-soft" : "shadow"}`}>
 
               <p className="text-xs uppercase tracking-wide text-gray-dark">
                 Productos
               </p>
 
               <p className="text-2xl font-bold text-primary-strong">
-                {filteredSummary.length}
+                {selectedProductIds.length > 0 ? selectedProductIds.length : totalProducts}
               </p>
 
             </div>
 
-            <div className="rounded-2xl bg-success-soft p-3">
+            <div className={`rounded-2xl p-3 ${selectedProductIds.length > 0 ? "bg-primary-soft" : "shadow"}`}>
 
             <p className="text-xs uppercase tracking-wide text-gray-dark">
               Unidades
             </p>
 
             <p className="text-2xl font-bold text-primary-strong">
-              {totalUnits}
+              {deliveredUnits}
             </p>
 
             </div>
@@ -133,76 +162,98 @@ return (
             />
         </div>
 
-        <div className="max-h-[520px] overflow-y-auto divide-y divide-gray-light/50">
-          {filteredSummary.map((item) => {
-          const selected = selectedProductIds.includes(item.productId);
+        <div className="relative">
+  <div
+    ref={listRef}
+    className="scroll-area max-h-[520px] overflow-y-auto divide-y divide-gray-light/50 shadow-sm"
+  >
+    {filteredSummary.map((item) => {
+      const selected = selectedProductIds.includes(item.productId);
 
-          return (
+      return (
+        <div
+          key={item.productId}
+          onClick={() => {
+            if (selected) {
+              onProductSelect(
+                selectedProductIds.filter((id) => id !== item.productId)
+              );
+            } else {
+              onProductSelect([
+                ...selectedProductIds,
+                item.productId,
+              ]);
+            }
+          }}
+          className={`
+            group
+            flex items-center justify-between
+            px-4 py-3
+            cursor-pointer
+            transition-all
+
+            ${
+              selected
+                ? "bg-primary-soft"
+                : "hover:bg-primary-soft/30"
+            }
+          `}
+        >
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-medium text-dark">
+              {item.productName}
+            </p>
+
+            <p className="text-sm text-gray-dark/80">
+              {item.quantity} {item.quantityUnit} · {item.unitType}
+            </p>
+          </div>
+
+          <div className="ml-4 flex items-center gap-2">
             <div
-              key={item.productId}
-              onClick={() => {
-                if (selected) {
-                  onProductSelect(
-                    selectedProductIds.filter((id) => id !== item.productId)
-                  );
-                } else {
-                  onProductSelect([
-                    ...selectedProductIds,
-                    item.productId,
-                  ]);
+              className={`
+                flex h-8 min-w-8 items-center justify-center gap-2 rounded-full px-2
+                font-semibold
+                ${
+                  selected
+                    ? "bg-primary text-white-strong"
+                    : "bg-primary-soft/30 text-primary-strong"
                 }
-              }}
-             className={`
-                group
-                flex items-center justify-between
-                px-4 py-3
-                cursor-pointer
-                transition-all
-          
-                ${selected ? "bg-primary-soft" : "hover:bg-primary-soft/30"}
-             `}
+              `}
             >
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-dark">
-                  {item.productName}
-                </p>
-
-              <p className="text-sm text-gray-dark/80">
-                {item.quantity} {item.quantityUnit} · {item.unitType}
-              </p>
+              {selected && <CheckIcon sx={{ fontSize: 14 }} />}
+              {item.totalQuantity}
             </div>
 
-            <div className="ml-4 flex items-center gap-2">
-              <div
-                className={`
-                  flex h-8 min-w-8 items-center justify-center gap-2 rounded-full px-2
-                  font-semibold
-                  ${
-                    selected
-                      ? "bg-primary text-white-strong"
-                      : "bg-primary-soft/30 text-primary-strong"
-                  }
-                  `}
-              >
-                {selected && <CheckIcon sx={{ fontSize: 14 }} />} {item.totalQuantity}
-              </div>
-
-              <ChevronRightIcon
-                fontSize="small"
-                className={`
-                  transition-all duration-200
-                  ${
+            <ChevronRightIcon
+              fontSize="small"
+              className={`
+                transition-all duration-200
+                ${
                   selected
                     ? "translate-x-1 text-primary"
                     : "text-gray-400 group-hover:translate-x-1 group-hover:text-primary"
-                  }
-                `}
-              />
-            </div>
+                }
+              `}
+            />
           </div>
-          );
-          })}
         </div>
+      );
+    })}
+  </div>
+
+  {showScrollHint && (
+    <div className="pointer-events-none absolute inset-x-0 bottom-0">
+      <div className="h-20 bg-gradient-to-t from-white via-white/20 to-transparent">
+        <div className="flex justify-center pt-8">
+          <div className="flex h-10 w-10 animate-bounce items-center justify-center rounded-full bg-dark-soft text-white shadow-xl">
+            <KeyboardArrowDownIcon />
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+</div>
     </section>
   );
 }

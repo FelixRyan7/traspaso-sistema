@@ -234,8 +234,9 @@ return request;
 
 };
 
-const createDirectDelivery = async (locationId, body, user) => {
-  const { productId, quantity } = body;
+const createDelivery = async (locationId, body, user) => {
+  const { productId, quantity, deliveryDate } = body;
+  console.log(body)
 
   if (!productId) {
     throw new AppError(
@@ -267,13 +268,15 @@ const createDirectDelivery = async (locationId, body, user) => {
 
   const today = new Date().toISOString().split("T")[0];
 
+  const date = deliveryDate || today;
+
   // si existe un deliverd hoy se incrementa posicion
   const delivered = await LocationRequest.findOne({
     where: {
       locationId,
       productId,
       status: "delivered",
-      date: today,
+      date,
     },
   });
 
@@ -292,7 +295,7 @@ const createDirectDelivery = async (locationId, body, user) => {
     productId,
     quantity,
     status: "delivered",
-    date: today,
+    date,
     deliveredAt: new Date(),
     userId: user.id,
   });
@@ -342,6 +345,6 @@ module.exports = {
   getLocationTransfersSummary,
   addItem,
   deliverRequest,
-  createDirectDelivery,
+  createDelivery,
   updateLocationDeliveredRequest
 };

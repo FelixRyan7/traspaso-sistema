@@ -58,7 +58,7 @@ export default function SelectFloatingRHF({
 
       {/* DROPDOWN */}
       {open && (
-        <div className="absolute z-50 mt-2 w-full bg-white border border-gray-light rounded-lg shadow-md max-h-60 overflow-y-auto">
+        <div className="scroll-area absolute z-50 mt-2 w-full bg-white/30 backdrop-blur-md border border-gray-light rounded-lg shadow-md max-h-60 overflow-y-auto">
           {options.map((opt) => (
             <button
               key={opt.value}

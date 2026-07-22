@@ -22,7 +22,6 @@ type Props = {
   onToChange: (value: string) => void;
 
   onSearch: () => void;
-  onCreateTransfer: () => void;
 };
 
 export default function TransferFilters({
@@ -35,7 +34,6 @@ export default function TransferFilters({
   onFromChange,
   onToChange,
   onSearch,
-  onCreateTransfer,
 }: Props) {
 
   const today = new Date().toISOString().split("T")[0];
@@ -45,7 +43,6 @@ export default function TransferFilters({
       className="
         rounded-2xl
         bg-white-soft
-        backdrop-blur-md
         shadow-sm
         p-6
       "
@@ -105,8 +102,8 @@ export default function TransferFilters({
           </Button>
 
           <Button
-            variant="secondary"
-            onClick={onCreateTransfer}
+            to="/workspace/scheduled-deliveries"
+            variant="dark"
             className="h-14"
           >
             <AddOutlinedIcon fontSize="small" />

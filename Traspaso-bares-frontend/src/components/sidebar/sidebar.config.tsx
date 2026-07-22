@@ -2,12 +2,15 @@ import SpaceDashboardOutlinedIcon from "@mui/icons-material/SpaceDashboardOutlin
 import FastfoodOutlinedIcon from "@mui/icons-material/FastfoodOutlined";
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import ViewModuleOutlinedIcon from '@mui/icons-material/ViewModuleOutlined';
+import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
+import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 
 export type SidebarItem = {
   label: string;
-  to: string;
+  to?: string;
   icon: React.ReactNode;
   roles: string[];
+  children?: SidebarItem[];
 };
 
 export const sidebarItems: SidebarItem[] = [
@@ -26,13 +29,26 @@ export const sidebarItems: SidebarItem[] = [
   {
     label: "Ubicaciones",
     to: "/workspace/admin/pos",
-    icon: <StorefrontOutlinedIcon  />,
+    icon: <LocationOnOutlinedIcon  />,
     roles: ["admin", "manager"],
   },
   {
-    label: "Transfers",
-    to: "/workspace/transfers",
+    label: "Traspasos",
     icon: <ViewModuleOutlinedIcon  />,
     roles: ["admin", "manager"],
+    children: [
+      {
+        label: "Historial",
+        to: "/workspace/transfers",
+        icon: <ViewModuleOutlinedIcon />,
+        roles: ["admin", "manager"],
+      },
+      {
+        label: "Registrar",
+        to: "/workspace/scheduled-deliveries",
+        icon: <LocalShippingOutlinedIcon />,
+        roles: ["admin", "manager"],
+      },
+    ],
   },
 ];

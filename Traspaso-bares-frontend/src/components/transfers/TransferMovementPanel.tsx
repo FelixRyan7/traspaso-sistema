@@ -6,6 +6,13 @@ import type { ApiError } from '../../types/api';
 import type { TransferSummaryItem } from '../../types/transfers';
 import { formatSpanishDate } from '../../helpers/formatSpanishDate';
 import { formatUnitType } from '../../helpers/formatUnitType';
+import { useMemo } from 'react';
+import useMediaQuery from '@mui/material/useMediaQuery';
+
+type TransferRow = LocationRequestWithProduct & {
+  dateGroup: number;
+  showDate: boolean;
+};
 
 type Props = {
     transfers: LocationRequestWithProduct[];
@@ -18,7 +25,7 @@ type Props = {
 
 export default function TransferList({transfers, loading, error, summary,  selectedProductIds, onClearFilter}: Props) {
 
-     const columns: Column<LocationRequestWithProduct>[] = [
+     const columns: Column<TransferRow>[] = [
       
       {
         key: "product",
@@ -34,7 +41,25 @@ export default function TransferList({transfers, loading, error, summary,  selec
       {
         key: "date",
         header: "Fecha",
-        render: (_, row) => formatSpanishDate(row.date)
+        render: (_, row) => (
+          <span
+            className={`
+              inline-flex
+              rounded-full
+              px-3
+              py-1
+              text-xs
+              font-semibold
+              ${
+                row.dateGroup === 0
+                  ? "bg-success-soft text-success-strong"
+                  : "bg-success text-white"
+              }
+            `}
+          >
+            {formatSpanishDate(row.date)}
+          </span>
+        ),
       },
       {
         key: "status",
@@ -44,11 +69,29 @@ export default function TransferList({transfers, loading, error, summary,  selec
       },
     ];
 
-    
-
     const selectedProducts = summary.filter((item) =>
       selectedProductIds.includes(item.productId)
     );
+
+    const transfersWithGroups: TransferRow[] = useMemo(() => {
+  let currentDate = "";
+  let group = -1;
+
+  return transfers.map((transfer) => {
+    const isNewGroup = transfer.date !== currentDate;
+
+    if (isNewGroup) {
+      currentDate = transfer.date;
+      group++;
+    }
+
+    return {
+      ...transfer,
+      dateGroup: group % 2,
+      showDate: isNewGroup,
+    };
+  });
+}, [transfers]);
 
   if (loading) {
     return <p>Cargando...</p>;
@@ -127,13 +170,13 @@ export default function TransferList({transfers, loading, error, summary,  selec
   </div>
   
 </div>
-     <div className='flex min-h-0'> 
+     <div className='flex-1 lg:flex min-h-0'> 
      <DataTable
-              data={transfers}
+              data={transfersWithGroups}
               columns={columns}
               stickyHeader
               mobileRender={(transfer) => (
-                <>
+                <>    
                   <div className="flex items-center justify-between">
                      <h3 className="font-semibold text-dark">
                       {transfer.product.name}

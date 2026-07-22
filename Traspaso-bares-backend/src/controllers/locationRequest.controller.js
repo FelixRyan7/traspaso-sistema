@@ -84,8 +84,8 @@ const deliverRequest = async (req, res) => {
   res.json(updated);
 };
 
-const createDirectDelivery = async (req, res) => {
-  const delivery = await locationRequestService.createDirectDelivery(
+const createDelivery = async (req, res) => {
+  const delivery = await locationRequestService.createDelivery(
     Number(req.params.locationId),
     req.body,
     req.user
@@ -114,6 +114,6 @@ module.exports = {
   getLocationTransfersSummary,
   addItem,
   deliverRequest,
-  createDirectDelivery,
+  createDelivery,
   updateLocationDeliveredRequest
 };
