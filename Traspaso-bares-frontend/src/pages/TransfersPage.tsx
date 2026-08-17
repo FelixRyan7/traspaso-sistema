@@ -3,7 +3,7 @@ import TransferFilters from "../components/transfers/TransferFilters";
 import { useSearchParams } from "react-router-dom";
 import { useLocations } from "../hooks/PosHooks/useLocations";
 import { useLocationTransfersByDate } from "../hooks/orderHooks/useLocationTransfersByDate";
-import TransferList from "../components/transfers/TransferMovementPanel";
+import TransferMovementPanel from "../components/transfers/TransferMovementPanel";
 import { useLocationTransfersSummary } from "../hooks/orderHooks/useLocationTransfersSummary";
 import TransferSummary from "../components/transfers/TransferProductPanel";
 import TransferHeader from "../components/transfers/TransferHeader";
@@ -94,7 +94,10 @@ export default function TransfersPage() {
 
 
   return (
-  <div className="flex h-full min-h-0 flex-col gap-6">
+  <div className="flex h-full min-h-0 flex-col gap-6 p-6">
+    <h2 className="text-xl ml-4 font-bold text-dark">
+      Traspasos <span className="text-primary">{location?.name}</span>  
+    </h2>
     <TransferFilters
       locations={locationOptions}
       locationId={locationId}
@@ -109,13 +112,6 @@ export default function TransfersPage() {
 
     {hasSearched && (
       <>
-        <TransferHeader
-          from={from}
-          to={to}
-          locationName={location?.name}
-          movementsCount={movementsCount}
-          deliveredUnits={deliveredUnits}
-        />
 
         <div className="mt-6 flex-1 min-h-0 grid lg:grid-cols-12 gap-6 items-stretch">
           <div className="lg:col-span-4 lg:sticky lg:top-6 lg:self-start h-full">
@@ -141,8 +137,10 @@ export default function TransfersPage() {
 
           <div className="lg:col-span-8 h-full min-h-0">
             {shouldShowTransfers ? (
-              <TransferList
+              <TransferMovementPanel
                 transfers={visibleTransfers}
+                movementsCount={movementsCount}
+                deliveredUnits={deliveredUnits}
                 loading={transfersLoading}
                 error={transfersErrors}
                 summary={summary}
