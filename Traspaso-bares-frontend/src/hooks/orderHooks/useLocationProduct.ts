@@ -6,14 +6,20 @@ import type { ApiError } from "../../types/api";
 export type LocationProductItem = {
   productId: number;
   name: string;
+  brand?: string | null;
   category: string;
   subcategory: string;
   unitType: string;
   quantity: number;
-  quantityUnit:string;
-  
-  companyProduct?: {
+  quantityUnit: string;
+
+  companyProduct: {
+    id: number;
     suggestedQuantity?: number | null;
+    inventoryUnit?: "unit" | "kg" | "g" | "l" | "ml" | null;
+    operationalArea: "bar" | "kitchen";
+    isActive: boolean;
+    isStockLow: boolean;
   };
 
   locationProduct: {
