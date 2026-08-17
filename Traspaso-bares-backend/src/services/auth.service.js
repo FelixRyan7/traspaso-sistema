@@ -92,7 +92,6 @@ const login = async ({ username, password, userAgent, ip }) => {
   }
 }).catch(() => {});
 
-  
   const user = await User.findOne({ where: { username } });
 
   if (!user) {
@@ -123,12 +122,12 @@ const login = async ({ username, password, userAgent, ip }) => {
   // REVOCAR sesiones anteriores (1 sesión por usuario para MVP)
   await Session.update(
     { revoked: true },
-    { where: { idUsuario: user.id, revoked: false } }
+    { where: { userId: user.id, revoked: false } }
   );
   const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
   // CREAR nueva sesión
   const session = await Session.create({
-    idUsuario: user.id,
+    userId: user.id,
     refreshToken: hashedRefreshToken,
     expiresAt,
     userAgent,
@@ -143,7 +142,8 @@ const login = async ({ username, password, userAgent, ip }) => {
       name: user.name,
       username: user.username,
       email: user.email,
-      role: user.role
+      role: user.role,
+      operationalArea: user.operationalArea
     },
     sessionId: session.id
   };
@@ -192,7 +192,7 @@ if (!sessionId) {
   }
 
   // 5. obtener usuario
-  const user = await User.findByPk(session.idUsuario);
+  const user = await User.findByPk(session.userId);
 
   if (!user) {
     throw new AppError("Usuario no encontrado", "USER_NOT_FOUND", 404);
