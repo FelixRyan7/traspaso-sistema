@@ -8,7 +8,7 @@ const Session = sequelize.define("Session", {
     primaryKey: true,
   },
 
-  idUsuario: {
+  userId: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
@@ -42,6 +42,12 @@ const Session = sequelize.define("Session", {
     type: DataTypes.STRING,
     allowNull: true,
   }
-});
+  
+},
+{
+  tableName: 'sessions',
+  timestamps: true,
+}
+);
 
 module.exports = Session;

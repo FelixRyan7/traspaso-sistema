@@ -15,7 +15,7 @@ const sequelize = require('../config/database');
       allowNull: false,
     },
 
-    productId: {
+    companyProductId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -35,7 +35,7 @@ const sequelize = require('../config/database');
     indexes: [
       {
         unique: true,
-        fields: ["locationId", "productId"],
+        fields: ['locationId', 'companyProductId'],
       },
     ],
   }
