@@ -27,20 +27,24 @@ const authMiddleware = (req, res, next) => {
 }
     
     if(error.name==="TokenExpiredError"){
-      new AppError(
+      return next(
+        new AppError(
           "Tu sesión ha expirado",
           "TOKEN_EXPIRED",
           401
+        )
       );
     }
 
     // 🔴 TOKEN ALTERADO o FIRMA INVALIDA
     if(error.name==="JsonWebTokenError"){
-      new AppError(
+      return next(
+        new AppError(
           "Token inválido",
           "INVALID_TOKEN",
           401
-      );
+        )
+      ); 
     }
 
    return next(error);
