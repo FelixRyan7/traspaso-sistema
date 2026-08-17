@@ -30,6 +30,7 @@ const getDashboard = async (authUser) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      operationalArea: user.operationalArea
     },
 
     company: {
