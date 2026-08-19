@@ -92,9 +92,9 @@ export const SUBCATEGORY_OPTIONS: readonly SubcategoryFilterOption[] = [
     subcategories: ["coffee"],
   },
   {
-    key: "ice",
-    label: "Ice",
-    subcategories: ["ice" , "frozen"],
+    key: "food",
+    label: "Comida",
+    subcategories: ["snack" , "frozen"],
   },
   {
     key: "other_group",
