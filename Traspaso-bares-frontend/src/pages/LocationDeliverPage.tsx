@@ -11,9 +11,10 @@ import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined
 import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined';
 import SubcategoryFilter from "../components/ui/Filters/SubcategoryFilter";
 import SearchBar from "../components/ui/Filters/SearchBar";
-import { SUBCATEGORY_OPTIONS } from "../constants/products";
+
 import { ErrorState } from "../components/ui/Alerts/ErrorState";
 import { useWorkspaceLocation } from "../hooks/PosHooks/useLocation";
+import { SUBCATEGORY_OPTIONS } from "../constants/productOptions";
 
 export default function LocationDirectDeliverPage() {
   const { locationId } = useParams();
@@ -33,9 +34,14 @@ export default function LocationDirectDeliverPage() {
         search.trim() === "" ||
         p.name.toLowerCase().includes(search.toLowerCase());
 
+      const activeFilter = SUBCATEGORY_OPTIONS.find(
+        (option) => option.key === activeSubcategory
+      );
+
       const matchesSubcategory =
-        activeSubcategory === "all" ||
-        p.subcategory === activeSubcategory;
+        activeSubcategory === "all"
+          ? true
+          : activeFilter?.subcategories.includes(p.subcategory) ?? false;
 
       return matchesSearch && matchesSubcategory;
     });
@@ -104,7 +110,7 @@ export default function LocationDirectDeliverPage() {
       />
 
       {/* GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {filteredProducts.map((product) => (
           <LocationDeliverCard
             key={product.productId}

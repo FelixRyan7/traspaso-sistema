@@ -11,9 +11,9 @@ import { useAlerts } from "../hooks/alerts/useAlerts";
 import { useLocationRequests } from "../hooks/orderHooks/useLocationRequests";
 import SubcategoryFilter from "../components/ui/Filters/SubcategoryFilter";
 import SearchBar from "../components/ui/Filters/SearchBar";
-import { SUBCATEGORY_OPTIONS } from "../constants/products";
 import { useWorkspaceLocation } from "../hooks/PosHooks/useLocation";
 import { ErrorState } from "../components/ui/Alerts/ErrorState";
+import { SUBCATEGORY_OPTIONS } from "../constants/productOptions";
 
 export default function LocationListPage() {
   const { locationId } = useParams();
@@ -36,9 +36,13 @@ export default function LocationListPage() {
         search.trim() === "" ||
         p.name.toLowerCase().includes(search.toLowerCase());
 
+      const activeFilter = SUBCATEGORY_OPTIONS.find(
+        (option) => option.key === activeSubcategory
+      );
+
       const matchesSubcategory =
-        activeSubcategory === "all" ||
-        p.subcategory === activeSubcategory;
+      activeSubcategory === "all" ||
+      activeFilter?.subcategories.includes(p.subcategory);
 
       return matchesSearch && matchesSubcategory;
     });

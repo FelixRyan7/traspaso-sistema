@@ -16,6 +16,8 @@ type TransferRow = LocationRequestWithProduct & {
 
 type Props = {
     transfers: LocationRequestWithProduct[];
+    movementsCount: number;
+    deliveredUnits: number;
     loading: boolean;
     error: AxiosError<ApiError> | null;
     summary: TransferSummaryItem[];
@@ -23,10 +25,9 @@ type Props = {
     onClearFilter: () => void;
 }
 
-export default function TransferList({transfers, loading, error, summary,  selectedProductIds, onClearFilter}: Props) {
+export default function TransferList({transfers, movementsCount, deliveredUnits, loading, error, summary,  selectedProductIds, onClearFilter}: Props) {
 
-     const columns: Column<TransferRow>[] = [
-      
+    const columns: Column<TransferRow>[] = [
       {
         key: "product",
         header: "Producto",
@@ -74,8 +75,8 @@ export default function TransferList({transfers, loading, error, summary,  selec
     );
 
     const transfersWithGroups: TransferRow[] = useMemo(() => {
-  let currentDate = "";
-  let group = -1;
+    let currentDate = "";
+    let group = -1;
 
   return transfers.map((transfer) => {
     const isNewGroup = transfer.date !== currentDate;
@@ -110,7 +111,7 @@ export default function TransferList({transfers, loading, error, summary,  selec
     <section className="flex h-full min-h-0 flex-col">
     <div className="px-3 mb-3 mt-1">
         <p className="mb-2 text-sm font-medium text-gray-dark">
-          Mostrando
+          Mostrando <span className='text-primary'>{movementsCount} movimientos</span>
         </p>
 
     <div className="flex flex-wrap items-center gap-2">

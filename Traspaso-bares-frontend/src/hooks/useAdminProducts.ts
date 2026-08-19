@@ -9,6 +9,8 @@ export type Product = {
   category: string;
   subcategory: string;
   unitType: string;
+  quantity: number;
+  quantityUnit: string;
 
   locations: {
     id: number;

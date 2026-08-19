@@ -32,6 +32,21 @@ const CompanyProduct = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    inventoryUnit: {
+      type: DataTypes.ENUM(
+        'unit',
+        'kg',
+        'g',
+        'l',
+        'ml'
+      ),
+      allowNull: true,
+    },
+    operationalArea: {
+      type: DataTypes.ENUM('bar', 'kitchen'),
+      allowNull: false,
+      defaultValue: 'bar',
+    },
   },
   {
     tableName: 'company_products',

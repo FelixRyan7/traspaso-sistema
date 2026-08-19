@@ -37,7 +37,6 @@ export default function LocationScheduledDeliveryPage() {
     const handleSearch = async () => {
         await refetch();
         setHasSearched(true);
-        console.log(locationId, deliveryDate);
     };
     const handleLocationChange = (id: number) => {
         setLocationId(id);
@@ -88,16 +87,30 @@ export default function LocationScheduledDeliveryPage() {
       onSearch={handleSearch}
     />
     {hasSearched && (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-5">
-            {products.map((product) => (
-              <LocationDeliverCard
-                key={product.productId}
-                product={product}
-                onDeliver={handleDeliver}
-              />
-            ))}
-          </div>
+  <>
+    {isLoading ? (
+      <p className="mt-5 text-center">Cargando productos...</p>
+    ) : error ? (
+      <p className="mt-5 text-center text-red-500">
+        Ha ocurrido un error al cargar los productos.
+      </p>
+    ) : products.length === 0 ? (
+      <div className="mt-5 rounded-lg border border-gray-300 p-6 text-center text-gray-500">
+        No hay productos para esta ubicación.
+      </div>
+    ) : (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-5">
+        {products.map((product) => (
+          <LocationDeliverCard
+            key={product.productId}
+            product={product}
+            onDeliver={handleDeliver}
+          />
+        ))}
+      </div>
     )}
+  </>
+)}
     </>
   );
 }

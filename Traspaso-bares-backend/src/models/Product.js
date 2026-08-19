@@ -16,6 +16,11 @@ const Product = sequelize.define(
       allowNull: false,
     },
 
+    brand: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
     // Categoria general
     category: {
       type: DataTypes.ENUM(
@@ -24,6 +29,7 @@ const Product = sequelize.define(
         'beer',
         'wine',
         'food',
+        'cocktail',
         'supplies',
         'other'
       ),
@@ -38,17 +44,45 @@ const Product = sequelize.define(
         'rum',
         'whisky',
         'tequila',
+        'brandy',
         'aperitif',
         'liqueur',
+        'red',
+        'white',
+        'rose',
+        'sparkling',
+        'cava',
+        'champagne',
         'beer',
         'water',
         'juice',
         'soda',
+        'iced_tea',
+        'isotonic',
         'energy_drink',
         'coffee',
+        'puree',
+        'smoothie',
+        'cordial',
+        'syrup',
+        'mixer',
+        'garnish',
+        'premix',
         'cleaning',
         'fruit',
+        'snack',
         'ice',
+        'tea',
+        'sauce',
+        'cup',
+        'lid',
+        'straw',
+        'napkin',
+        'cleaning',
+        'cleaning_tool',
+        'cloth',
+        'gloves',
+        'paper',
         'other'
       ),
       allowNull: false,
@@ -62,9 +96,14 @@ const Product = sequelize.define(
         'box',
         'bag',
         'unit',
-        'barril',
-        'bib'
-      ),
+        'barrel',
+        'jar',
+        'pouch',
+        'bib',
+        'brick',
+        'roll'
+      ), 
+
       allowNull: false,
     },
 
@@ -89,6 +128,17 @@ const Product = sequelize.define(
     isActive: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
+    },
+    isStandardCatalog: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
+
+    defaultSuggestedQuantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
     },
   },
   {

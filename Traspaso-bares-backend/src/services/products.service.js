@@ -13,6 +13,7 @@ const getAdminProducts = async (companyId) => {
     include: [
       {
         model: CompanyProduct,
+        as: "companyProducts",
         where: { companyId },
         attributes: [],
         required: true,
@@ -40,7 +41,7 @@ const createProduct = async (data, companyId) => {
     ...productData
   } = data;
 
-  // 1. evitar duplicados dentro del hotel
+  // Evitar duplicados dentro del hotel
   const existing = await Product.findOne({
     where: {
       name: productData.name,
@@ -49,6 +50,7 @@ const createProduct = async (data, companyId) => {
     include: [
       {
         model: CompanyProduct,
+        as: "companyProducts",
         where: { companyId },
         required: true,
       },
@@ -63,28 +65,40 @@ const createProduct = async (data, companyId) => {
     );
   }
 
-  // 2. crear producto global
-  const product = await Product.create(productData);
+  return await sequelize.transaction(async (transaction) => {
+    // 1. Crear producto global
+    const product = await Product.create(productData, {
+      transaction,
+    });
 
-  // 3. relación producto-hotel + suggestedQuantity
-  const companyProduct = await CompanyProduct.create({
-    companyId,
-    productId: product.id,
-    suggestedQuantity,
-  });
-
-  // 4. relaciones producto-location
-  if (locations?.length) {
-    await LocationProduct.bulkCreate(
-      locations.map((locationId) => ({
-        locationId,
+    // 2. Crear relación empresa-producto
+    const companyProduct = await CompanyProduct.create(
+      {
+        companyId,
         productId: product.id,
-        isActive: true,
-      }))
+        suggestedQuantity,
+      },
+      {
+        transaction,
+      }
     );
-  }
 
-  return product;
+    // 3. Crear relaciones location-product
+    if (locations?.length) {
+      await LocationProduct.bulkCreate(
+        locations.map((locationId) => ({
+          locationId,
+          companyProductId: companyProduct.id,
+          isActive: true,
+        })),
+        {
+          transaction,
+        }
+      );
+    }
+
+    return product;
+  });
 };
 
 module.exports = {

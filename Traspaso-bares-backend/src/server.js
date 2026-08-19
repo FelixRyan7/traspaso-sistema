@@ -3,17 +3,14 @@ const app = require('./app');
 const sequelize = require('./config/database'); // 👈 IMPORTANTE
 
 
-require('./models/User');
-
 const PORT = process.env.PORT || 3000;
 
 async function start() {
   try {
     await sequelize.authenticate();
     console.log('✅ Conexión a MySQL exitosa');
-    await sequelize.sync();
 
-    app.listen(PORT, () => {
+    app.listen(PORT, "0.0.0.0", () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });
 

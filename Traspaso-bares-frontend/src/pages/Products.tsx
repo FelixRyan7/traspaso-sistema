@@ -14,6 +14,10 @@ import { getApiError } from "../api/apiError";
 import type { ProductFormData } from "../schemas/createProduct.schema";
 import { useLocations } from "../hooks/PosHooks/useLocations";
 import { ErrorState } from "../components/ui/Alerts/ErrorState";
+import { formatCategory } from "../helpers/formatCategory";
+import { formatSubcategory } from "../helpers/formatSubcategory";
+import { formatUnitType } from "../helpers/formatUnitType";
+import { formatQuantity } from "../helpers/formatQuantity";
 
 export default function Products() {
   const { data: locations = [], error: locationsError } = useLocations();
@@ -25,9 +29,14 @@ export default function Products() {
 
   const columns: Column<Product>[] = [
     { key: "name", header: "Producto" },
-    { key: "category", header: "Categoría" },
-    { key: "subcategory", header: "Subcategoría" },
-    { key: "unitType", header: "Unidad" },
+    { key: "unitType", header: "Unidad", render: (value) => formatUnitType(value as string)},
+    {
+      key: "quantity",
+      header: "Cantidad",
+      render: (_, row) => formatQuantity(row.quantity, row.quantityUnit),
+    },
+    { key: "category", header: "Categoría", render: (value) => formatCategory(value as string), },
+    { key: "subcategory", header: "Subcategoría", render: (value) => formatSubcategory(value as string), },
   ];
 
   const filteredData = useMemo(() => {
@@ -49,6 +58,7 @@ export default function Products() {
   const { mutateAsync, isPending } = useCreateProduct();
 
   const handleCreateProduct = async (data: ProductFormData): Promise<void> => {
+    console.log(data)
   mutateAsync(data, {
     onSuccess: () => {
       addAlert({
