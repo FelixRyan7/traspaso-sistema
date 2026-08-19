@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "migrate": "sequelize-cli db:migrate",
+    "seed:prod": "sequelize-cli db:seed:all"
   },
   "keywords": [],
   "author": "",
@@ -21,7 +23,6 @@
     "helmet": "^8.2.0",
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.22.4",
-    "react-hot-toast": "^2.6.0",
     "sanitize-html": "^2.17.5",
     "sequelize": "^6.37.8",
     "uuid": "^14.0.0",

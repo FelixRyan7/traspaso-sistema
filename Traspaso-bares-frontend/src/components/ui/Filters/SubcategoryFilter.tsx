@@ -1,10 +1,11 @@
-type Subcategory = {
+type SubcategoryFilter = {
   key: string;
   label: string;
+  subcategories: readonly string[];
 };
 
 type Props = {
-  options: readonly Subcategory[];
+  options: readonly SubcategoryFilter[];
   value: string;
   onChange: (value: string) => void;
 };
