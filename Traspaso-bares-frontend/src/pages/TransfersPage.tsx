@@ -95,7 +95,7 @@ export default function TransfersPage() {
 
   return (
   <div className="flex h-full min-h-0 flex-col gap-6 p-6">
-    <h2 className="text-xl ml-4 font-bold text-dark">
+    <h2 className="text-xl ml-4 font-bold text-dark mb-6">
       Traspasos <span className="text-primary">{location?.name}</span>  
     </h2>
     <TransferFilters

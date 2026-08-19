@@ -2,7 +2,7 @@ import { ErrorState } from "../components/ui/Alerts/ErrorState";
 import { Spinner } from "../components/ui/Loaders/Spinner";
 import { useDashboard } from "../hooks/useDashboard";
 import { useNavigate } from "react-router-dom";
-
+import CircleIcon from '@mui/icons-material/Circle';
 
 export default function Workspace() {
   const navigate = useNavigate();
@@ -19,7 +19,8 @@ export default function Workspace() {
   };
   return (
     <>
-    <h3 className="mt-2 text-center text-primary">Puntos de Venta en {data?.company.name}:</h3>
+    <div className="p-6">
+    <h2 className="mt-2 text-xl font-bold text-dark mb-6">Puntos de Venta en <span className="text-primary">{data?.company.name}</span></h2>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
     {data?.locations?.map((location) => (
       <div
@@ -46,6 +47,7 @@ export default function Workspace() {
         </div>
       </div>
     ))}
+    </div>
     </div>
     </>
   )
