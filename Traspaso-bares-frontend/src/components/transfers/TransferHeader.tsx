@@ -24,6 +24,7 @@ export default function TransferHeader({
         backdrop-blur-md
         shadow-sm
         p-6
+        z-20
       "
     >
       <div className="flex items-end justify-between">

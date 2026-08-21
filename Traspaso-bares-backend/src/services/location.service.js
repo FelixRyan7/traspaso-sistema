@@ -130,64 +130,58 @@ const toggleLocation = async (locationId, authUser) => {
 };
 
 const getLocationProducts = async (locationId, user) => {
-  // 1. productos del location (sin includes raros)
   const locationProducts = await LocationProduct.findAll({
     where: { locationId },
     include: [
       {
-        model: Product,
-        attributes: [
-          "id",
-          "name",
-          "category",
-          "subcategory",
-          "unitType",
-          "quantity",
-          "quantityUnit",
+        model: CompanyProduct,
+        as: "companyProduct",
+        required: true,
+        include: [
+          {
+            model: Product,
+            as: "product",
+            attributes: [
+              "id",
+              "name",
+              "brand",
+              "category",
+              "subcategory",
+              "unitType",
+              "quantity",
+              "quantityUnit",
+            ],
+          },
         ],
       },
     ],
   });
 
-  // 2. config de company (suggested quantity)
-  const companyProducts = await CompanyProduct.findAll({
-    where: {
-      companyId: user.companyId,
+  return locationProducts.map((lp) => ({
+    productId: lp.companyProduct.product.id,
+
+    name: lp.companyProduct.product.name,
+    brand: lp.companyProduct.product.brand,
+    category: lp.companyProduct.product.category,
+    subcategory: lp.companyProduct.product.subcategory,
+    unitType: lp.companyProduct.product.unitType,
+    quantity: lp.companyProduct.product.quantity,
+    quantityUnit: lp.companyProduct.product.quantityUnit,
+
+    locationProduct: {
+      id: lp.id,
+      priceOverride: lp.priceOverride,
     },
-    attributes: ["productId", "suggestedQuantity"],
-  });
 
-  // 3. map para acceso rápido
-  const cpMap = new Map(
-    companyProducts.map((cp) => [cp.productId, cp])
-  );
-
-  // 4. response limpio
-  return locationProducts.map((lp) => {
-    const p = lp.Product;
-    const cp = cpMap.get(p.id);
-
-    return {
-      productId: p.id,
-      name: p.name,
-      category: p.category,
-      subcategory: p.subcategory,
-      unitType: p.unitType,
-      quantity: p.quantity,
-      quantityUnit: p.quantityUnit,
-
-      locationProduct: {
-        id: lp.id,
-        priceOverride: lp.priceOverride,
-      },
-
-      companyProduct: cp
-        ? {
-            suggestedQuantity: cp.suggestedQuantity,
-          }
-        : null,
-    };
-  });
+    companyProduct: {
+      id: lp.companyProduct.id,
+      suggestedQuantity: lp.companyProduct.suggestedQuantity,
+      inventoryUnit: lp.companyProduct.inventoryUnit,
+      operationalArea: lp.companyProduct.operationalArea,
+      isActive: lp.companyProduct.isActive,
+      isStockLow: lp.companyProduct.isStockLow,
+    },
+  }));
 };
 
 module.exports = {

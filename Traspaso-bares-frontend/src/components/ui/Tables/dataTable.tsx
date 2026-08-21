@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { DataTableProps } from "../../../types/table";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 export type Column<T> = {
   key: keyof T;
@@ -22,89 +23,152 @@ export function DataTable<T extends Record<string, any>>({
   stickyHeader = false,
   className = "",
 }: ResponsiveDataTableProps<T>) {
-  if (!data.length) {
-    return (
-      <div className="rounded-2xl border border-gray-light bg-white-soft p-6 text-center text-gray-dark">
-        No hay registros disponibles
-      </div>
-    );
-  }
+  
+  const [showScrollHint, setShowScrollHint] = useState(false);
+  const listRef = useRef<HTMLDivElement | null>(null);
+  
+    useEffect(() => {
+      const list = listRef.current;
+  
+      if (!list) return;
+  
+      const updateHint = () => {
+        const hasOverflow = list.scrollHeight > list.clientHeight;
+        const isAtTop = list.scrollTop < 10;
+  
+        setShowScrollHint(hasOverflow && isAtTop);
+      };
+  
+      updateHint();
+  
+      list.addEventListener("scroll", updateHint);
+      window.addEventListener("resize", updateHint);
+  
+      return () => {
+        list.removeEventListener("scroll", updateHint);
+        window.removeEventListener("resize", updateHint);
+      };
+    },);
 
+   if (!data.length) {
   return (
-    <>
-      {/* Desktop */}
-          <div
-            className={`
-              hidden md:flex
-              flex-1
-              min-h-0
-              overflow-auto
-              rounded-3xl
-              border border-gray-light/70
-              bg-white-soft
-              shadow-sm
-              ${className}
-            `}
-          >        
-          <table className="min-w-full self-start">
-          <thead
-            className={`bg-gradient-to-r
-              from-primary-soft
-              via-white-soft
-              to-primary-soft
-               ${stickyHeader ? "sticky top-0 z-20" : ""}`}
-          >
-            <tr>
-              {columns.map((column) => (
-                <th
-                  key={String(column.key)}
-                  className="
-                    px-6 py-5 text-left
-                    text-[11px] font-black uppercase
-                    tracking-[0.22em]
-                    text-primary-strong
-                  "
-                >
-                  {column.header}
-                </th>
-              ))}
-            </tr>
-          </thead>
+    <div className="flex h-full min-h-[320px] items-center justify-center rounded-3xl bg-white-soft ring-1 ring-gray-light/50 shadow-sm">
+      <div className="max-w-sm text-center">
+        <p className="text-lg font-semibold text-dark">
+          No hay registros
+        </p>
 
-          <tbody>
-            {data.map((row, index) => (
-              <tr
-                key={index}
-                onClick={() => onRowClick?.(row)}
+        <p className="mt-2 text-sm text-gray-dark">
+          Cuando existan movimientos aparecerán aquí.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+return (
+  <>
+    {/* Desktop */}
+    <div
+      ref={listRef}
+      className={`
+        relative
+        hidden md:flex
+        flex-1
+        min-h-0
+        overflow-auto
+        scrollbar-hide
+        rounded-3xl
+        bg-white-soft
+        ring-1 ring-gray-light/50
+        shadow-sm
+        ${className}
+      `}
+    >
+      <table className="min-w-full border-separate border-spacing-0">
+        <thead
+          className={`
+            bg-dark-soft
+            backdrop-blur-md
+            border-b border-gray-light/50
+            ${stickyHeader ? "sticky top-0 z-20" : ""}
+          `}
+        >
+          <tr>
+            {columns.map((column) => (
+              <th
+                key={String(column.key)}
                 className="
-                  border-t border-gray-light/70
-                  transition-all duration-200
-                  hover:bg-primary-soft/20
-                  cursor-pointer active:scale-[0.998]
-                  hover:shadow-[inset_0_1px_3px_rgba(26,117,159,0.1)]
-                  group
+                  first:pl-8
+                  last:pr-8
+                  px-6
+                  py-5
+                  text-left
+                  text-[11px]
+                  font-semibold
+                  uppercase
+                  tracking-[0.18em]
+                  text-white
                 "
               >
-                {columns.map((column) => (
-                  <td
-                    key={String(column.key)}
-                    className="
-                      px-6 py-5
-                      text-sm font-medium
-                      text-dark
-                      group-hover:text-primary-strong
-                    "
-                  >
-                    {column.render
-                      ? column.render(row[column.key], row)
-                      : String(row[column.key])}
-                  </td>
-                ))}
-              </tr>
+                {column.header}
+              </th>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </tr>
+        </thead>
+
+        <tbody>
+          {data.map((row, index) => (
+            <tr
+              key={index}
+              onClick={() => onRowClick?.(row)}
+              className="
+                group
+                cursor-pointer
+                border-b border-gray-light/40
+                transition-colors duration-200
+                hover:bg-primary-soft/30
+              "
+            >
+              {columns.map((column, columnIndex) => (
+                <td
+                  key={String(column.key)}
+                  className={`
+                    first:pl-8
+                    last:pr-8
+                    px-6
+                    py-5
+                    align-middle
+                    text-sm
+                    ${
+                      columnIndex === 0
+                        ? "font-medium text-dark"
+                        : "font-normal text-gray-dark"
+                    }
+                  `}
+                >
+                  {column.render
+                    ? column.render(row[column.key], row)
+                    : String(row[column.key])}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {showScrollHint && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20">
+          <div className="h-20 bg-gradient-to-t from-white-soft via-white-soft/70 to-transparent">
+            <div className="flex justify-center pt-8">
+              <div className="flex h-10 w-10 animate-bounce items-center justify-center rounded-full bg-dark-soft text-white shadow-lg">
+                <KeyboardArrowDownIcon fontSize="small" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
 
       {/* Mobile */}
       <div className="space-y-3 md:hidden">

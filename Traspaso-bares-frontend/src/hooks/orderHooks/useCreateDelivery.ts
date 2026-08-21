@@ -5,9 +5,10 @@ type DirectDeliveryParams = {
   locationId: number;
   productId: number;
   quantity: number;
+  deliveryDate?: string;
 };
 
-export const useCreateDirectDelivery = () => {
+export const useCreateDelivery = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -15,12 +16,14 @@ export const useCreateDirectDelivery = () => {
       locationId,
       productId,
       quantity,
+      deliveryDate
     }: DirectDeliveryParams) => {
       const res = await api.post(
         `/locationRequests/${locationId}/deliveries`,
         {
           productId,
           quantity,
+          deliveryDate
         }
       );
 

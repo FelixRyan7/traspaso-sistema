@@ -1,4 +1,4 @@
-export type  = LocationRequest & {
+export type LocationRequestWithProduct = LocationRequest & {
   product: {
     id: number;
     name: string;

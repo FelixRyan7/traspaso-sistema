@@ -11,9 +11,9 @@ import { useAlerts } from "../hooks/alerts/useAlerts";
 import { useLocationRequests } from "../hooks/orderHooks/useLocationRequests";
 import SubcategoryFilter from "../components/ui/Filters/SubcategoryFilter";
 import SearchBar from "../components/ui/Filters/SearchBar";
-import { SUBCATEGORY_OPTIONS } from "../constants/products";
 import { useWorkspaceLocation } from "../hooks/PosHooks/useLocation";
 import { ErrorState } from "../components/ui/Alerts/ErrorState";
+import { SUBCATEGORY_OPTIONS } from "../constants/productOptions";
 
 export default function LocationListPage() {
   const { locationId } = useParams();
@@ -36,9 +36,13 @@ export default function LocationListPage() {
         search.trim() === "" ||
         p.name.toLowerCase().includes(search.toLowerCase());
 
+      const activeFilter = SUBCATEGORY_OPTIONS.find(
+        (option) => option.key === activeSubcategory
+      );
+
       const matchesSubcategory =
-        activeSubcategory === "all" ||
-        p.subcategory === activeSubcategory;
+      activeSubcategory === "all" ||
+      activeFilter?.subcategories.includes(p.subcategory);
 
       return matchesSearch && matchesSubcategory;
     });
@@ -94,13 +98,23 @@ export default function LocationListPage() {
         onClose={removeAlert}
         floating
       /> 
-      <h3 className="text-dark">Prepara la lista para <span className="font-bold">{location?.name}</span> </h3>
-      { hasActiveRequests && (
-        <div className="bg-primary/10 border border-primary text-primary rounded-xl px-4 py-2 flex justify-between items-center">
+      <div className="flex flex-col gap-5 sm:gap-1 sm:flex-row sm:justify-between">
+        <div className="flex flex-col">
+           <h3 className="text-dark ">Prepara la lista para <span className="font-bold">{location?.name}</span> </h3>
+              <p className="text-sm text-gray">
+                {new Date().toLocaleDateString("es-ES", {
+                  weekday: "long",
+                  day: "2-digit",
+                  month: "long",
+                })}
+              </p>
+        </div>
+        { hasActiveRequests && (
+        <div className="bg-primary-soft border shadow text-primary-strong rounded-xl sm:px-4 sm:py-2 px-2 py-2 flex justify-center sm:justify-end items-center gap-3 animate-bounce">
     
-          <div>
-            🧾 Lista activa
-            <div className="text-xs opacity-70">
+          <div className="text-center text-xs ">
+            🧾 Lista Activa De Hoy
+            <div className="text-xs mt-1">
               {requests.length} productos añadidos
             </div>
           </div>
@@ -109,13 +123,18 @@ export default function LocationListPage() {
             onClick={() => {
               navigate(`/workspace/locations/${locationId}/requests`);
             }}
-            className="font-semibold underline"
+            className="font-semibold no-underline "
           >
-            Ver lista →
+            →
           </button>
 
+
         </div>
+        
       )}
+      </div>
+      
+      
 
       {/* 🔎 SEARCH */}
       <SearchBar value={search} onChange={setSearch} />

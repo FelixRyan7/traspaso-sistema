@@ -6,3 +6,13 @@
   background: rgba(0,0,0,0.15);
   border-radius: 10px;
 }
+
+/* Oculta la barra de scroll pero mantiene el scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE y Edge antiguo */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari y Edge */
+}

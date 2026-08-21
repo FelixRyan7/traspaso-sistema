@@ -42,7 +42,7 @@ router.post(
   "/:locationId/deliveries",
   authMiddleware,
   requireRoles('admin', 'manager', 'staff'),
-  asyncHandler(locationRequestController.createDirectDelivery)
+  asyncHandler(locationRequestController.createDelivery)
 );
 
 router.patch(

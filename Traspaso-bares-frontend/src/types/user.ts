@@ -1,4 +1,5 @@
 export type UserRole = 'admin' | 'staff';
+export type UserOperationalArea = 'bar' | 'kitchen';
 
 export interface User {
   id: number;
@@ -6,4 +7,5 @@ export interface User {
   username: string;
   email: string;
   role: UserRole;
+  operationalArea:UserOperationalArea
 }

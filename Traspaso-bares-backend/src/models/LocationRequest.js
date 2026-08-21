@@ -17,7 +17,7 @@ const LocationRequest = sequelize.define(
     
     locationId: {
       type: DataTypes.INTEGER,
-      allowNull: true, // temporalmente
+      allowNull: false, // temporalmente
     },
      // tipo de movimiento dentro del día
      status: {

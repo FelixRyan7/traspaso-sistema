@@ -14,10 +14,10 @@ import SelectFloatingRHF from "../ui/Inputs/SelectInput";
 
 import {
   CATEGORY_OPTIONS,
-  SUBCATEGORY_OPTIONS,
   UNIT_TYPE_OPTIONS,
   QUANTITY_UNIT_OPTIONS
 } from "../../constants/productOptions";
+import { SUBCATEGORY_SELECT_OPTIONS } from "../../constants/products";
 
 
 type Props = {
@@ -102,7 +102,7 @@ export default function ProductModalForm({
               <SelectFloatingRHF
                 id="subcategory"
                 label="Subcategoría"
-                options={SUBCATEGORY_OPTIONS}
+                options={SUBCATEGORY_SELECT_OPTIONS}
                 value={field.value}
                 onChange={field.onChange}
                 error={errors.subcategory?.message}
