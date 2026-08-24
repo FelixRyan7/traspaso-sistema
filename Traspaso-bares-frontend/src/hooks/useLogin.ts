@@ -28,7 +28,7 @@ export const useLogin = () => {
       return res.data;
     },
 
-    onSuccess: (data) => {
+    onSuccess: () => {
     },
 
     onError: (error) => {

@@ -1,6 +1,4 @@
-import { useAuthStore } from "../../store/auth.store";
 import MenuIcon from "@mui/icons-material/Menu";
-import type { User } from "../../types/user";
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 
 type Props = {
@@ -9,7 +7,6 @@ type Props = {
 
 
 export default function PrivateHeader({ setMobileOpen }: Props) {
-  const user = useAuthStore((state) => state.user);
 
   return (
     <header

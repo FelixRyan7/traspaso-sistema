@@ -19,7 +19,7 @@ type Props = {
   deliveredUnits: number;
 
   onProductSelect: (ids: number[]) => void;
-  onClearFilter: () => void;
+  onClearFilter: () => void; // Por implementar y añadir a props
 };
 
 export default function TransferSummary({
@@ -31,7 +31,6 @@ export default function TransferSummary({
   selectedProductIds,
   deliveredUnits,
   onProductSelect,
-  onClearFilter
 }: Props) {
 
   const [showScrollHint, setShowScrollHint] = useState(false);

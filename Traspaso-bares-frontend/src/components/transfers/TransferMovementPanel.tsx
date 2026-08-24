@@ -7,7 +7,6 @@ import type { TransferSummaryItem } from '../../types/transfers';
 import { formatSpanishDate } from '../../helpers/formatSpanishDate';
 import { formatUnitType } from '../../helpers/formatUnitType';
 import { useMemo } from 'react';
-import useMediaQuery from '@mui/material/useMediaQuery';
 
 type TransferRow = LocationRequestWithProduct & {
   dateGroup: number;
@@ -17,7 +16,7 @@ type TransferRow = LocationRequestWithProduct & {
 type Props = {
     transfers: LocationRequestWithProduct[];
     movementsCount: number;
-    deliveredUnits: number;
+    deliveredUnits: number; //no esta en porps, quizas la usemos en un futuro
     loading: boolean;
     error: AxiosError<ApiError> | null;
     summary: TransferSummaryItem[];
@@ -25,7 +24,7 @@ type Props = {
     onClearFilter: () => void;
 }
 
-export default function TransferList({transfers, movementsCount, deliveredUnits, loading, error, summary,  selectedProductIds, onClearFilter}: Props) {
+export default function TransferList({transfers, movementsCount, loading, error, summary,  selectedProductIds, onClearFilter}: Props) {
 
     const columns: Column<TransferRow>[] = [
       {

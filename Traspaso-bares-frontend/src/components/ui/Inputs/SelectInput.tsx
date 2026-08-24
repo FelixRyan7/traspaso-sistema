@@ -16,7 +16,6 @@ type Props = {
 };
 
 export default function SelectFloatingRHF({
-  id,
   label,
   options,
   value,

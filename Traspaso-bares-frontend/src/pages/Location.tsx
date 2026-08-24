@@ -1,12 +1,10 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useLocation } from "../hooks/useLocation";
 import { Spinner } from "../components/ui/Loaders/Spinner";
-import { getApiError } from "../api/apiError";
 
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
-import ChecklistOutlinedIcon from '@mui/icons-material/ChecklistOutlined';
 
 import { useLocationRequests } from "../hooks/orderHooks/useLocationRequests";
 import { Button } from "../components/ui/Buttons/Button";

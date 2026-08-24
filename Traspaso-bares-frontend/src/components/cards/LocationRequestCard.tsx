@@ -17,15 +17,14 @@ export type ProductSummary = {
 type Props = {
   item: ProductSummary;
   onDeliver: (item: ProductSummary, quantity: number) => void;
-  onDelete?: (item: ProductSummary) => void;
-  onLowStock?: (item: ProductSummary) => void;
+  onDelete?: (item: ProductSummary) => void; // Auno por implemenntar y añadir a props
+  onLowStock?: (item: ProductSummary) => void; // Auno por implemenntar y añadir a props
 };
 
 export default function LocationRequestCard({
   item,
   onDeliver,
-  onDelete,
-  onLowStock,
+
 }: Props) {
   const [qty, setQty] = useState(item.quantity);
 

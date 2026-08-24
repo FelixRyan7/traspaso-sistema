@@ -20,7 +20,7 @@ export const useUpdateLocationDeliveredRequest = () => {
       return res.data;
     },
 
-    onSuccess: (_, variables) => {
+    onSuccess: (_,) => {
       // refrescar listas relevantes
       queryClient.invalidateQueries({
         queryKey: ["location-requests-delivered"],

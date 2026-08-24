@@ -2,7 +2,6 @@ import { ErrorState } from "../components/ui/Alerts/ErrorState";
 import { Spinner } from "../components/ui/Loaders/Spinner";
 import { useDashboard } from "../hooks/useDashboard";
 import { useNavigate } from "react-router-dom";
-import CircleIcon from '@mui/icons-material/Circle';
 
 export default function Workspace() {
   const navigate = useNavigate();

@@ -6,7 +6,6 @@ import { useLocationTransfersByDate } from "../hooks/orderHooks/useLocationTrans
 import TransferMovementPanel from "../components/transfers/TransferMovementPanel";
 import { useLocationTransfersSummary } from "../hooks/orderHooks/useLocationTransfersSummary";
 import TransferSummary from "../components/transfers/TransferProductPanel";
-import TransferHeader from "../components/transfers/TransferHeader";
 import { useWorkspaceLocation } from "../hooks/PosHooks/useLocation";
 import { Button } from "../components/ui/Buttons/Button";
 
