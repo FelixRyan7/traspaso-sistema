@@ -47,11 +47,6 @@ const login = async (req, res) => {
     ...cookieOptions,
     maxAge: refreshExpiresDays * 24 * 60 * 60 * 1000,
   });
-  const setCookie = res.getHeader("Set-Cookie");
-
-console.log("🍪 SET-COOKIE ATTRIBUTES:", setCookie?.map(cookie =>
-  cookie.split(";").slice(1).join(";")
-));
 
   return res.status(200).json({
     accessToken,
@@ -60,13 +55,7 @@ console.log("🍪 SET-COOKIE ATTRIBUTES:", setCookie?.map(cookie =>
 };
 
 const refresh = async (req, res) => {
-  console.log("🍪 REFRESH DEBUG", {
-  origin: req.headers.origin,
-  referer: req.headers.referer,
-  cookieNames: Object.keys(req.cookies || {}),
-  hasRefreshToken: !!req.cookies?.refreshToken,
-  hasSessionId: !!req.cookies?.sessionId,
-});
+
   const refreshToken = req.cookies?.refreshToken;
   const sessionId = req.cookies?.sessionId;
 
