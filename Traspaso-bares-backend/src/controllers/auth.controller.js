@@ -43,27 +43,15 @@ const login = async (req, res) => {
     maxAge: refreshExpiresDays * 24 * 60 * 60 * 1000,
   });
 
-
   res.cookie("sessionId", sessionId, {
     ...cookieOptions,
     maxAge: refreshExpiresDays * 24 * 60 * 60 * 1000,
   });
-  console.log("🍪 COOKIES SET", {
-  refreshToken: true,
-  sessionId: true,
-  cookieOptions: {
-    httpOnly: cookieOptions.httpOnly,
-    secure: cookieOptions.secure,
-    sameSite: cookieOptions.sameSite,
-    path: cookieOptions.path,
-  },
-});
+  const setCookie = res.getHeader("Set-Cookie");
 
-  console.log("🔐 LOGIN DEBUG", {
-  origin: req.headers.origin,
-  frontendUrl: process.env.FRONTEND_URL,
-  nodeEnv: process.env.NODE_ENV,
-});
+console.log("🍪 SET-COOKIE ATTRIBUTES:", setCookie?.map(cookie =>
+  cookie.split(";").slice(1).join(";")
+));
 
   return res.status(200).json({
     accessToken,
