@@ -48,6 +48,12 @@ const login = async (req, res) => {
     maxAge: refreshExpiresDays * 24 * 60 * 60 * 1000,
   });
 
+  console.log("🔐 LOGIN DEBUG", {
+  origin: req.headers.origin,
+  frontendUrl: process.env.FRONTEND_URL,
+  nodeEnv: process.env.NODE_ENV,
+});
+
   return res.status(200).json({
     accessToken,
     user
@@ -55,8 +61,10 @@ const login = async (req, res) => {
 };
 
 const refresh = async (req, res) => {
-  console.log("🍪 REFRESH REQUEST", {
-  source: req.headers["x-refresh-source"],
+  console.log("🍪 REFRESH DEBUG", {
+  origin: req.headers.origin,
+  referer: req.headers.referer,
+  cookieNames: Object.keys(req.cookies || {}),
   hasRefreshToken: !!req.cookies?.refreshToken,
   hasSessionId: !!req.cookies?.sessionId,
 });

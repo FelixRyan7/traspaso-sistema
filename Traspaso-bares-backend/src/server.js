@@ -13,7 +13,6 @@ async function start() {
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });
-    console.log("🌍 NODE_ENV:", process.env.NODE_ENV);
 
   } catch (error) {
     console.error('❌ Error conectando a MySQL:', error);
