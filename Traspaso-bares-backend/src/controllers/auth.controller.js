@@ -43,10 +43,21 @@ const login = async (req, res) => {
     maxAge: refreshExpiresDays * 24 * 60 * 60 * 1000,
   });
 
+
   res.cookie("sessionId", sessionId, {
     ...cookieOptions,
     maxAge: refreshExpiresDays * 24 * 60 * 60 * 1000,
   });
+  console.log("🍪 COOKIES SET", {
+  refreshToken: true,
+  sessionId: true,
+  cookieOptions: {
+    httpOnly: cookieOptions.httpOnly,
+    secure: cookieOptions.secure,
+    sameSite: cookieOptions.sameSite,
+    path: cookieOptions.path,
+  },
+});
 
   console.log("🔐 LOGIN DEBUG", {
   origin: req.headers.origin,
