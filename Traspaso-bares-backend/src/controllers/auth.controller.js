@@ -55,6 +55,10 @@ const login = async (req, res) => {
 };
 
 const refresh = async (req, res) => {
+  console.log("🍪 Refresh cookies:", {
+    hasRefreshToken: !!req.cookies?.refreshToken,
+    hasSessionId: !!req.cookies?.sessionId,
+  });
   const refreshToken = req.cookies?.refreshToken;
   const sessionId = req.cookies?.sessionId;
 
