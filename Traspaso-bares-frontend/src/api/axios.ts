@@ -46,10 +46,15 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const res = await axios.post(
-          import.meta.env.VITE_API_REFRESH_URL,
-          {},
-          { withCredentials: true }
-        );
+  import.meta.env.VITE_API_REFRESH_URL,
+  {},
+  {
+    withCredentials: true,
+    headers: {
+      "X-Refresh-Source": "interceptor",
+    },
+  }
+);
         const { accessToken, user } = res.data;
 
         // guardar nuevo estado

@@ -5,42 +5,27 @@ import api from "../api/axios";
 export const bootstrapAuth = async () => {
   const store = useAuthStore.getState();
 
-  console.log("🚀 bootstrapAuth iniciado", {
-    hasAccessToken: !!store.accessToken,
-  });
-
+  // Si ya hay token no hacemos nada
   if (store.accessToken) {
-    console.log("✅ Ya existe accessToken");
-    store.setHydrated(true);
+    store.setHydrated(true)
     return;
-  }
+  } 
 
   try {
-    console.log("🔄 Intentando /auth/refresh");
-
-    const res = await api.post("/auth/refresh");
-
-    console.log("✅ Refresh correcto", {
-      hasAccessToken: !!res.data.accessToken,
-      hasUser: !!res.data.user,
-    });
+    const res = await api.post("/auth/refresh", {}, {
+  headers: {
+    "X-Refresh-Source": "bootstrap",
+  },
+});
 
     const { accessToken: newToken, user } = res.data;
 
     store.setAuth(user, newToken);
 
   } catch (error) {
-
-    console.log("❌ Bootstrap refresh falló", {
-      code: getApiError(error).code,
-    });
-
+    console.log(getApiError(error).code)
     store.logout();
-
   } finally {
-
-    console.log("💧 Bootstrap hidratado");
-
-    store.setHydrated(true);
+    store.setHydrated(true)
   }
 };
