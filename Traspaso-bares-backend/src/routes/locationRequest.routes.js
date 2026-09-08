@@ -59,4 +59,11 @@ router.patch(
   asyncHandler(locationRequestController.updateLocationDeliveredRequest)
 );
 
+router.patch(
+  "/:id/cancel",
+  authMiddleware,
+  requireRoles("admin", "manager", "staff"),
+  asyncHandler(locationRequestController.cancelLocationRequest)
+);
+
 module.exports = router;

@@ -315,8 +315,8 @@ const updateLocationDeliveredRequest = async (id, user, data) => {
 
   if (!request) {
     throw new AppError(
-      "REQUEST_NOT_FOUND",
       "Request no encontrada",
+      "REQUEST_NOT_FOUND",
       404
     );
   }
@@ -324,9 +324,18 @@ const updateLocationDeliveredRequest = async (id, user, data) => {
   // seguridad: misma company
   if (request.location.companyId !== user.companyId) {
     throw new AppError(
+       "No tienes permisos",
       "FORBIDDEN",
-      "No tienes permisos",
       403
+    );
+  }
+
+  // solo se pueden editar traspasos entregados
+  if (request.status !== "delivered") {
+    throw new AppError(
+      "Solo se pueden editar traspasos entregados",
+      "REQUEST_NOT_DELIVERED",
+      400
     );
   }
 
@@ -338,6 +347,57 @@ const updateLocationDeliveredRequest = async (id, user, data) => {
   return request;
 };
 
+const cancelLocationRequest = async (id, user) => {
+  const request = await LocationRequest.findByPk(id);
+
+  if (!request) {
+    throw new AppError(
+      "Traspaso no encontrado",
+      "LOCATION_REQUEST_NOT_FOUND",
+      404
+    );
+  }
+
+  const location = await Location.findByPk(request.locationId);
+
+  assertCompanyAccess(user, location);
+
+  if (request.status !== "delivered") {
+    throw new AppError(
+      "Solo se pueden anular traspasos entregados",
+      "LOCATION_REQUEST_NOT_DELIVERED",
+      400
+    );
+  }
+
+  // Buscar si ya existe un cancelled para ese
+  // producto, location y día
+  const cancelled = await LocationRequest.findOne({
+    where: {
+      locationId: request.locationId,
+      productId: request.productId,
+      status: "cancelled",
+      date: request.date,
+    },
+  });
+
+  if (cancelled) {
+    // Ya existe un cancelled -> acumular
+    cancelled.quantity += request.quantity;
+
+    await cancelled.save();
+    await request.destroy();
+
+    return cancelled;
+  }
+
+  // No existe cancelled -> convertir el delivered
+  request.status = "cancelled";
+
+  await request.save();
+
+  return request;
+};
 
 module.exports = {
   getLocationRequests,
@@ -346,5 +406,6 @@ module.exports = {
   addItem,
   deliverRequest,
   createDelivery,
-  updateLocationDeliveredRequest
+  updateLocationDeliveredRequest,
+  cancelLocationRequest
 };

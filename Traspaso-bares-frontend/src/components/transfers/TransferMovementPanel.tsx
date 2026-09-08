@@ -8,6 +8,9 @@ import { formatSpanishDate } from '../../helpers/formatSpanishDate';
 import { formatUnitType } from '../../helpers/formatUnitType';
 import { useMemo } from 'react';
 
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+
 type TransferRow = LocationRequestWithProduct & {
   dateGroup: number;
   showDate: boolean;
@@ -22,9 +25,11 @@ type Props = {
     summary: TransferSummaryItem[];
     selectedProductIds: number[];
     onClearFilter: () => void;
+    onEdit: (transfer: LocationRequestWithProduct) => void;
+    onDelete: (transfer: LocationRequestWithProduct) => void;
 }
 
-export default function TransferList({transfers, movementsCount, loading, error, summary,  selectedProductIds, onClearFilter}: Props) {
+export default function TransferList({transfers, movementsCount, loading, error, summary,  selectedProductIds, onClearFilter, onDelete, onEdit}: Props) {
 
     const columns: Column<TransferRow>[] = [
       {
@@ -62,10 +67,27 @@ export default function TransferList({transfers, movementsCount, loading, error,
         ),
       },
       {
-        key: "status",
-        header: "Estado",
-        render: (status) =>
-          status === "delivered" ? "Entregado" : "Pendiente",
+        key: "actions",
+        header: "Acciones",
+        render: (_, row) => (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onEdit(row)}
+              className="rounded-md px-2 py-1 text-sm font-medium text-primary bg-primary-soft hover:bg-primary hover:text-white"
+            >
+              <EditOutlinedIcon/>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onDelete(row)}
+              className="rounded-md px-2 py-1 text-sm font-medium text-error bg-error-soft hover:bg-error hover:text-white"
+            >
+              <DeleteOutlineOutlinedIcon/>
+            </button>
+          </div>
+        ),
       },
     ];
 
@@ -181,10 +203,14 @@ export default function TransferList({transfers, movementsCount, loading, error,
                      <h3 className="font-semibold text-dark">
                       {transfer.product.name}
                     </h3>
-
-                    <span className="text-xs rounded-full bg-green-100 px-2 py-1 text-green-700">
-                      Entregado
-                    </span>
+                    <div className="flex items-center gap-2"> 
+                      <button type="button" onClick={() => onEdit(transfer)} className="rounded-md px-2 py-1 text-primary bg-primary-soft hover:bg-primary hover:text-white" aria-label="Editar traspaso" > 
+                        <EditOutlinedIcon /> 
+                      </button> 
+                      <button type="button" onClick={() => onDelete(transfer)} className="rounded-md px-2 py-1 text-error bg-error-soft hover:bg-error hover:text-white" aria-label="Anular traspaso" > 
+                        <DeleteOutlineOutlinedIcon /> 
+                      </button> 
+                    </div>
                   </div>
 
                   <div className="mt-3 space-y-1 text-sm font-bold">

@@ -2,11 +2,6 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { DataTableProps } from "../../../types/table";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
-export type Column<T> = {
-  key: keyof T;
-  header: string;
-  render?: (value: T[keyof T], row: T) => ReactNode;
-};
 
 export type ResponsiveDataTableProps<T extends Record<string, any>> =
   DataTableProps<T> & {
@@ -149,7 +144,8 @@ return (
                 >
                   {column.render
                     ? column.render(row[column.key], row)
-                    : String(row[column.key])}
+                    : String(row[column.key])
+                  }
                 </td>
               ))}
             </tr>

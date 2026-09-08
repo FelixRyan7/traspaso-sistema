@@ -23,7 +23,8 @@ const LocationRequest = sequelize.define(
      status: {
       type: DataTypes.ENUM(
         "pending",
-        "delivered"
+        "delivered",
+        "cancelled"
       ),
       allowNull: false,
       defaultValue: "pending",

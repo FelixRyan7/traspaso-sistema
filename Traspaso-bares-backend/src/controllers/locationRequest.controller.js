@@ -107,6 +107,18 @@ const updateLocationDeliveredRequest = async (req, res) => {
   res.json(updated);
 };
 
+const cancelLocationRequest = async (req, res) => {
+  const { id } = req.params;
+
+  const cancelled =
+    await locationRequestService.cancelLocationRequest(
+      Number(id),
+      req.user
+    );
+
+  return res.json(cancelled);
+};
+
 
 module.exports = {
   getLocationRequests,
@@ -115,5 +127,6 @@ module.exports = {
   addItem,
   deliverRequest,
   createDelivery,
-  updateLocationDeliveredRequest
+  updateLocationDeliveredRequest,
+  cancelLocationRequest
 };

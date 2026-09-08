@@ -27,5 +27,5 @@ export type CreateLocationRequestDto = {
   locationId: number;
   productId: number;
   quantity: number;
-  status: "pending" | "delivered";
+  status: "pending" | "delivered" | "cancelled";
 };
