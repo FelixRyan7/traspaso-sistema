@@ -4,6 +4,7 @@ import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import { useNavigate } from "react-router-dom";
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 
 type Props = {
   location: Location;
@@ -29,6 +30,16 @@ export default function LocationCardMenu({ location, onClose, onEdit }: Props) {
     >
       <button
         onClick={() => {
+          onEdit(location);
+        }}
+        className="flex items-center gap-3 w-full px-4 py-3 text-sm hover:bg-gray-light/50 transition"
+      >
+        <EditOutlinedIcon fontSize="small" />
+        Editar location
+      </button>
+      
+      <button
+        onClick={() => {
           onClose();
           navigate(`/workspace/transfers?locationId=${location.id}`);
         }}
@@ -38,16 +49,16 @@ export default function LocationCardMenu({ location, onClose, onEdit }: Props) {
         Gestion de traspasos
       </button>
 
-      
 
       <button
         onClick={() => {
-          onEdit(location);
+          onClose();
+          navigate(`/workspace/admin/pos/${location.id}/products`);;
         }}
         className="flex items-center gap-3 w-full px-4 py-3 text-sm hover:bg-gray-light/50 transition"
       >
-        <EditOutlinedIcon fontSize="small" />
-        Editar location
+        <AddOutlinedIcon fontSize="small" />
+        Gestionar Productos
       </button>
 
       <div className="mx-2 my-1 border-t border-gray-light/70" />
