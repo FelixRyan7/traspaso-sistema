@@ -42,4 +42,22 @@ router.get(
   asyncHandler(locationController.getLocationProducts)
 );
 
+router.get(
+  "/:locationId/products/manage",
+  authMiddleware,
+  asyncHandler(locationController.getLocationProductsManage)
+);
+
+router.post(
+  "/:locationId/products/:companyProductId",
+  authMiddleware,
+  asyncHandler(locationController.addLocationProduct)
+);
+
+router.delete(
+  "/:locationId/products/:companyProductId",
+  authMiddleware,
+  asyncHandler(locationController.deleteLocationProduct)
+);
+
 module.exports = router;
