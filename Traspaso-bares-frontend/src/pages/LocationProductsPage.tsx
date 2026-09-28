@@ -1,16 +1,14 @@
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import {
-  useLocationProducts,
-} from "../hooks/orderHooks/useLocationProduct";
-
-
-
 import { useWorkspaceLocation } from "../hooks/PosHooks/useLocation";
 
 import { ErrorState } from "../components/ui/Alerts/ErrorState";
-import { useAdminProducts } from "../hooks/useAdminProducts";
+
+import { useLocationProductsManage, useAddLocationProduct, type LocationProductManageItem, useDeleteLocationProduct } from "../hooks/PosHooks/useLocationProducts";
+import { useAlerts } from "../hooks/alerts/useAlerts";
+import { AlertList } from "../components/ui/Alerts/AlertList";
+import { getApiError } from "../api/apiError";
 
 type Filter = "all" | "assigned" | "unassigned";
 
@@ -20,36 +18,82 @@ export default function LocationProductsPage() {
   const id = Number(locationId);
 
   const {
-    data: locationProducts = [],
-    isLoading: locationProductsLoading,
-    error: locationProductsError,
-  } = useLocationProducts(id);
+  data: products = [],
+  isLoading,
+  error,
+} = useLocationProductsManage(id);
 
-  const {
-    data: adminProductsData,
-    isLoading: adminProductsLoading,
-    error: adminProductsError,
-  } = useAdminProducts();
+
 
   const { data: location } = useWorkspaceLocation(id);
 
+  const [recentlyAssignedId, setRecentlyAssignedId] = useState<number | null>(
+  null
+);
+
+  const {
+    alerts,
+    pushAlert,
+    removeAlert,
+  } = useAlerts();
+
+  const {
+    mutateAsync: addLocationProduct,
+    isPending: isAdding,
+  } = useAddLocationProduct();
+
+  const {
+    mutateAsync: deleteLocationProduct,
+    isPending: isDeleting,
+  } = useDeleteLocationProduct();
+
+  const isUpdating = isAdding || isDeleting;
+
+  const handleToggleProduct = async (
+  product: LocationProductManageItem
+) => {
+  try {
+    if (product.assigned) {
+      await deleteLocationProduct({
+        locationId: id,
+        companyProductId: product.companyProductId,
+      });
+
+      pushAlert({
+        type: "success",
+        content: "Producto Eliminado correctamente.",
+      });
+    } else {
+      await addLocationProduct({
+        locationId: id,
+        companyProductId: product.companyProductId,
+      });
+
+      setRecentlyAssignedId(product.companyProductId);
+
+      setTimeout(() => {
+        setRecentlyAssignedId(null);
+      }, 1000);
+
+      pushAlert({
+        type: "success",
+        content: "Producto asignado correctamente.",
+      });
+    }
+  } catch (error) {
+    console.error("Error actualizando producto", error);
+
+    const apiError = getApiError(error);
+
+    pushAlert({
+      type: "error",
+      content: apiError.message,
+    });
+  }
+};
+
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
-
-  const companyProducts = adminProductsData?.products ?? [];
-
-  const assignedProductIds = useMemo(() => {
-    return new Set(
-      locationProducts.map((product) => product.productId)
-    );
-  }, [locationProducts]);
-
-  const products = useMemo(() => {
-    return companyProducts.map((product) => ({
-      ...product,
-      assigned: assignedProductIds.has(product.id),
-    }));
-  }, [companyProducts, assignedProductIds]);
 
   const filteredProducts = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
@@ -72,12 +116,6 @@ export default function LocationProductsPage() {
     (product) => product.assigned
   ).length;
 
-  const isLoading =
-    locationProductsLoading || adminProductsLoading;
-
-  const error =
-    locationProductsError || adminProductsError;
-
   if (isLoading) {
     return <p>Cargando...</p>;
   }
@@ -88,6 +126,11 @@ export default function LocationProductsPage() {
 
   return (
     <div className="p-6">
+      <AlertList
+        messages={alerts}
+        onClose={removeAlert}
+        floating
+      />
       {/* HEADER */}
       <div className="mb-6">
         <h2 className="text-xl font-bold text-dark">
@@ -200,7 +243,7 @@ export default function LocationProductsPage() {
             <div className="divide-y divide-gray-light">
               {filteredProducts.map((product) => (
                 <label
-                  key={product.id}
+                  key={product.productId}
                   className="
                     flex
                     cursor-pointer
@@ -217,17 +260,26 @@ export default function LocationProductsPage() {
                     <input
                       type="checkbox"
                       checked={product.assigned}
-                      onChange={() => {}}
-                      className="
-                        h-5
-                        w-5
+                      disabled={isUpdating}
+                      onChange={() => handleToggleProduct(product)}
+                      className={`
+                        h-4
+                        w-4
                         cursor-pointer
                         rounded
                         border-gray-light
-                        text-primary
                         focus:ring-primary/30
-                      "
-                    />
+                        accent-primary/80
+                        transition-transform
+                        text-white
+                        duration-200
+                        ${
+                          recentlyAssignedId === product.companyProductId
+                            ? "scale-125"
+                            : "scale-100"
+                        }
+                      `}
+                    />                
 
                     <div>
                       <p className="text-sm font-semibold text-dark">
