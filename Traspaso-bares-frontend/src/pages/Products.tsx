@@ -21,7 +21,7 @@ import { formatQuantity } from "../helpers/formatQuantity";
 
 export default function Products() {
   const { data: locations = [], error: locationsError } = useLocations();
-  const { data,  error: productsError } = useAdminProducts();
+  const { data: products,  error: productsError } = useAdminProducts();
  
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
@@ -40,12 +40,12 @@ export default function Products() {
   ];
 
   const filteredData = useMemo(() => {
-    if (!data?.products) return [];
+    if (!products?.products) return [];
 
-    return data.products.filter((p: any) =>
+    return products.products.filter((p: any) =>
       p.name.toLowerCase().includes(search.toLowerCase())
     );
-  }, [data, search]);
+  }, [products, search]);
 
   const addAlert = (alert: AlertMessage) => {
     setAlerts((prev) => [...prev, alert]);

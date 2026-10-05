@@ -136,10 +136,10 @@ export default function LocationListPage() {
       
       
 
-      {/* 🔎 SEARCH */}
+      {/* SEARCH */}
       <SearchBar value={search} onChange={setSearch} />
 
-      {/* 🟦 PILLS */}
+      {/* PILLS */}
       <SubcategoryFilter
         options={SUBCATEGORY_OPTIONS}
         value={activeSubcategory}

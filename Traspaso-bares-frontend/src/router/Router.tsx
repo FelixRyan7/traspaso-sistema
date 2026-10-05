@@ -15,6 +15,7 @@ import LocationDeliverPage from "../pages/LocationDeliverPage";
 import LocationDailyDeliveries from "../pages/LocationTodayDeliveriesPage";
 import TransfersPage from "../pages/TransfersPage";
 import LocationScheduledDeliveryPage from "../pages/LocationScheduledDeliveryPage";
+import LocationProductsPage from "../pages/LocationProductsPage";
 
 export default function Router() {
   return (
@@ -50,11 +51,20 @@ export default function Router() {
                 </RoleGuard>
               }
             />
-             <Route path="admin/pos" element={
-              <RoleGuard allowedRoles={["admin", "manager"]}>
-                <Pos />
-              </RoleGuard>
-            } />
+            <Route path="admin/pos" element={
+                <RoleGuard allowedRoles={["admin", "manager"]}>
+                  <Pos />
+                </RoleGuard>
+              } 
+            />
+            <Route
+              path="admin/pos/:locationId/products"
+              element={
+                <RoleGuard allowedRoles={["admin", "manager"]}>
+                  <LocationProductsPage />
+                </RoleGuard>
+              }
+            />
             </Route>
           
         </Route>

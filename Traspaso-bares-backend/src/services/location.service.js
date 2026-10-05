@@ -184,11 +184,198 @@ const getLocationProducts = async (locationId, user) => {
   }));
 };
 
+const getLocationProductsManage = async (locationId, user) => {
+  const { companyId } = user;
+
+  const location = await Location.findOne({
+    where: {
+      id: locationId,
+      companyId,
+    },
+  });
+
+  if (!location) {
+    throw new AppError(
+      "La ubicación no pertenece a tu empresa",
+      "LOCATION_NOT_FOUND",
+      404
+    );
+  }
+
+  const companyProducts = await CompanyProduct.findAll({
+    where: {
+      companyId,
+    },
+    include: [
+      {
+        model: Product,
+        as: "product",
+        attributes: [
+          "id",
+          "name",
+          "brand",
+          "category",
+          "subcategory",
+          "unitType",
+          "quantity",
+          "quantityUnit",
+        ],
+      },
+    ],
+    order: [[{ model: Product, as: "product" }, "name", "ASC"]],
+  });
+
+  const locationProducts = await LocationProduct.findAll({
+    where: {
+      locationId,
+    },
+    attributes: ["companyProductId"],
+  });
+
+  const assignedCompanyProductIds = new Set(
+    locationProducts.map(
+      (locationProduct) => locationProduct.companyProductId
+    )
+  );
+
+  return companyProducts.map((companyProduct) => ({
+    productId: companyProduct.product.id,
+    companyProductId: companyProduct.id,
+    name: companyProduct.product.name,
+    brand: companyProduct.product.brand,
+    category: companyProduct.product.category,
+    subcategory: companyProduct.product.subcategory,
+    unitType: companyProduct.product.unitType,
+    quantity: companyProduct.product.quantity,
+    quantityUnit: companyProduct.product.quantityUnit,
+    assigned: assignedCompanyProductIds.has(companyProduct.id),
+  }));
+};
+
+const addLocationProduct = async (
+  locationId,
+  companyProductId,
+  user
+) => {
+  const { companyId } = user;
+
+  const location = await Location.findOne({
+    where: {
+      id: locationId,
+      companyId,
+    },
+  });
+
+  if (!location) {
+    throw new AppError(
+      "La ubicación no pertenece a tu empresa",
+      "LOCATION_NOT_FOUND",
+      404
+    );
+  }
+
+  const companyProduct = await CompanyProduct.findOne({
+    where: {
+      id: companyProductId,
+      companyId,
+    },
+  });
+
+  if (!companyProduct) {
+    throw new AppError(
+      "El producto no pertenece a tu empresa",
+      "COMPANY_PRODUCT_NOT_FOUND",
+      404
+    );
+  }
+
+  const existing = await LocationProduct.findOne({
+    where: {
+      locationId,
+      companyProductId,
+    },
+  });
+
+  if (existing) {
+    throw new AppError(
+      "El producto ya está asignado a esta ubicación",
+      "LOCATION_PRODUCT_ALREADY_EXISTS",
+      409
+    );
+  }
+
+  const locationProduct = await LocationProduct.create({
+    locationId,
+    companyProductId,
+    isActive: true,
+  });
+
+  return locationProduct;
+};
+
+const deleteLocationProduct = async (
+  locationId,
+  companyProductId,
+  user
+) => {
+  const { companyId } = user;
+
+  const location = await Location.findOne({
+    where: {
+      id: locationId,
+      companyId,
+    },
+  });
+
+  if (!location) {
+    throw new AppError(
+      "La ubicación no pertenece a tu empresa",
+      "LOCATION_NOT_FOUND",
+      404
+    );
+  }
+
+  const companyProduct = await CompanyProduct.findOne({
+    where: {
+      id: companyProductId,
+      companyId,
+    },
+  });
+
+  if (!companyProduct) {
+    throw new AppError(
+      "El producto no pertenece a tu empresa",
+      "COMPANY_PRODUCT_NOT_FOUND",
+      404
+    );
+  }
+
+  const locationProduct = await LocationProduct.findOne({
+    where: {
+      locationId,
+      companyProductId,
+    },
+  });
+
+  if (!locationProduct) {
+    throw new AppError(
+      "El producto no está asignado a esta ubicación",
+      "LOCATION_PRODUCT_NOT_FOUND",
+      404
+    );
+  }
+
+  await locationProduct.destroy();
+};
+
 module.exports = {
   getLocationsByCompany,
   getLocationById,
   createLocation,
   updateLocation,
   toggleLocation,
-  getLocationProducts
+  getLocationProducts,
+  getLocationProductsManage,
+  addLocationProduct,
+  deleteLocationProduct
 };

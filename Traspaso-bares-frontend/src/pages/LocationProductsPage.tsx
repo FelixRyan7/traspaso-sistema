@@ -1,0 +1,342 @@
+import { useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
+
+import { useWorkspaceLocation } from "../hooks/PosHooks/useLocation";
+
+import { ErrorState } from "../components/ui/Alerts/ErrorState";
+
+import { useLocationProductsManage, useAddLocationProduct, type LocationProductManageItem, useDeleteLocationProduct } from "../hooks/PosHooks/useLocationProducts";
+import { useAlerts } from "../hooks/alerts/useAlerts";
+import { AlertList } from "../components/ui/Alerts/AlertList";
+import { getApiError } from "../api/apiError";
+
+import SubcategoryFilter from "../components/ui/Filters/SubcategoryFilter";
+import SearchBar from "../components/ui/Filters/SearchBar";
+import { SUBCATEGORY_OPTIONS } from "../constants/productOptions";
+
+type Filter = "all" | "assigned" | "unassigned";
+
+export default function LocationProductsPage() {
+  const { locationId } = useParams<{ locationId: string }>();
+
+  const id = Number(locationId);
+
+  const {
+  data: products = [],
+  isLoading,
+  error,
+} = useLocationProductsManage(id);
+
+
+
+  const { data: location } = useWorkspaceLocation(id);
+
+  const [recentlyAssignedId, setRecentlyAssignedId] = useState<number | null>(
+  null
+);
+
+  const {
+    alerts,
+    pushAlert,
+    removeAlert,
+  } = useAlerts();
+
+  const {
+    mutateAsync: addLocationProduct,
+    isPending: isAdding,
+  } = useAddLocationProduct();
+
+  const {
+    mutateAsync: deleteLocationProduct,
+    isPending: isDeleting,
+  } = useDeleteLocationProduct();
+
+  const isUpdating = isAdding || isDeleting;
+
+  const handleToggleProduct = async (
+  product: LocationProductManageItem
+) => {
+  try {
+    if (product.assigned) {
+      await deleteLocationProduct({
+        locationId: id,
+        companyProductId: product.companyProductId,
+      });
+
+      pushAlert({
+        type: "success",
+        content: "Producto Eliminado correctamente.",
+      });
+    } else {
+      await addLocationProduct({
+        locationId: id,
+        companyProductId: product.companyProductId,
+      });
+
+      setRecentlyAssignedId(product.companyProductId);
+
+      setTimeout(() => {
+        setRecentlyAssignedId(null);
+      }, 1000);
+
+      pushAlert({
+        type: "success",
+        content: "Producto asignado correctamente.",
+      });
+    }
+  } catch (error) {
+    console.error("Error actualizando producto", error);
+
+    const apiError = getApiError(error);
+
+    pushAlert({
+      type: "error",
+      content: apiError.message,
+    });
+  }
+};
+
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<Filter>("all");
+  const [activeSubcategory, setActiveSubcategory] = useState("all");
+
+  const filteredProducts = useMemo(() => {
+    const normalizedSearch = search.trim().toLowerCase();
+
+    const activeFilter = SUBCATEGORY_OPTIONS.find(
+      (option) => option.key === activeSubcategory
+    );
+
+    return products.filter((product) => {
+      const matchesSearch =
+        normalizedSearch === "" ||
+        product.name.toLowerCase().includes(normalizedSearch);
+
+      const matchesFilter =
+        filter === "all" ||
+        (filter === "assigned" && product.assigned) ||
+        (filter === "unassigned" && !product.assigned);
+
+      const matchesSubcategory =
+        activeSubcategory === "all" ||
+        activeFilter?.subcategories.includes(product.subcategory);
+
+      return (
+        matchesSearch &&
+        matchesFilter &&
+        matchesSubcategory
+      );
+    });
+  }, [
+    products,
+    search,
+    filter,
+    activeSubcategory,
+  ]);
+
+  const assignedCount = products.filter(
+    (product) => product.assigned
+  ).length;
+
+  if (isLoading) {
+    return <p>Cargando...</p>;
+  }
+
+  if (error) {
+    return <ErrorState error={error} />;
+  }
+
+  return (
+    <div className="p-6">
+      <AlertList
+        messages={alerts}
+        onClose={removeAlert}
+        floating
+      />
+      {/* HEADER */}
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-dark">
+          Gestionar productos{" "}
+          <span className="text-primary">
+            {location?.name}
+          </span>
+        </h2>
+
+        <p className="mt-2 text-sm text-gray-dark">
+          Selecciona los productos disponibles en este punto de venta.
+        </p>
+      </div>
+
+      {/* PANEL */}
+      <div className="rounded-3xl bg-white-soft p-6 shadow-sm">
+        {/* SEARCH + STATUS FILTER */}
+        <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          {/* SEARCH */}
+          <div className="w-full lg:max-w-md">
+            <SearchBar
+              value={search}
+              onChange={setSearch}
+            />
+          </div>
+
+          {/* STATUS FILTER */}
+          <div>
+            <span className="mb-2 block text-sm font-medium text-dark">
+              Mostrar
+            </span>
+
+            <div className="flex rounded-xl bg-gray-light/40 p-1">
+              {[
+                { value: "all", label: "Todos" },
+                { value: "assigned", label: "Asignados" },
+                { value: "unassigned", label: "No asignados" },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setFilter(option.value as Filter)}
+                  className={`
+                    rounded-lg
+                    px-4
+                    py-2
+                    text-sm
+                    font-medium
+                    transition
+                    ${
+                      filter === option.value
+                        ? "bg-white text-primary shadow-sm"
+                        : "text-gray-dark hover:text-dark"
+                    }
+                  `}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* SUBCATEGORY FILTER */}
+        <div className="mb-6 -mx-1 overflow-x-auto pb-1 scrollbar-hide">
+          <div className="min-w-max mt-2 px-1">
+            <SubcategoryFilter
+              options={SUBCATEGORY_OPTIONS}
+              value={activeSubcategory}
+              onChange={setActiveSubcategory}
+            />
+          </div>
+        </div>
+
+        {/* SUMMARY */}
+        <div className="mb-5 flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-dark">
+              Productos
+            </h3>
+
+            <p className="mt-1 text-sm text-gray-dark">
+              {assignedCount} de {products.length} asignados
+            </p>
+          </div>
+
+          <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+            {filteredProducts.length} productos
+          </span>
+        </div>
+
+        {/* PRODUCTS */}
+        <div className="overflow-hidden rounded-2xl border border-gray-light bg-white">
+          {filteredProducts.length > 0 ? (
+            <div className="divide-y divide-gray-light">
+              {filteredProducts.map((product) => (
+                <label
+                  key={product.productId}
+                  className="
+                    flex
+                    cursor-pointer
+                    items-center
+                    justify-between
+                    gap-4
+                    px-5
+                    py-4
+                    transition
+                    hover:bg-gray-light/20
+                  "
+                >
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="checkbox"
+                      checked={product.assigned}
+                      disabled={isUpdating}
+                      onChange={() => handleToggleProduct(product)}
+                      className={`
+                        h-4
+                        w-4
+                        cursor-pointer
+                        rounded
+                        border-gray-light
+                        focus:ring-primary/30
+                        accent-primary/80
+                        transition-transform
+                        text-white
+                        duration-200
+                        ${
+                          recentlyAssignedId === product.companyProductId
+                            ? "scale-125"
+                            : "scale-100"
+                        }
+                      `}
+                    />                
+
+                    <div>
+                      <p className="text-sm font-semibold text-dark">
+                        {product.name}
+                      </p>
+
+                      <p className="mt-0.5 text-xs text-gray-dark">
+                        {product.category}
+                        {product.subcategory &&
+                          ` · ${product.subcategory}`}
+                      </p>
+                    </div>
+                  </div>
+
+                  <span
+                    className={`
+                      rounded-full
+                      px-3
+                      py-1
+                      text-xs
+                      font-medium
+                      ${
+                        product.assigned
+                          ? "bg-primary/10 text-primary"
+                          : "bg-gray-light/50 text-gray-dark"
+                      }
+                    `}
+                  >
+                    {product.assigned
+                      ? "Asignado"
+                      : "No asignado"}
+                  </span>
+                </label>
+              ))}
+            </div>
+          ) : (
+            <div className="flex min-h-[250px] items-center justify-center">
+              <div className="text-center">
+                <h3 className="text-lg font-semibold text-dark">
+                  No se encontraron productos
+                </h3>
+
+                <p className="mt-2 text-sm text-gray-dark">
+                  Prueba con otra búsqueda o filtro.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

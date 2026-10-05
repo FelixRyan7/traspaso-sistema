@@ -56,11 +56,49 @@ const getLocationProducts = async (req, res) => {
   return res.status(200).json(products);
 };
 
+const getLocationProductsManage = async (req, res) => {
+  const { locationId } = req.params;
+
+  const products = await locationService.getLocationProductsManage(
+    locationId,
+    req.user
+  );
+
+  return res.status(200).json(products);
+};
+
+const addLocationProduct = async (req, res) => {
+  const { locationId, companyProductId } = req.params;
+
+  const locationProduct = await locationService.addLocationProduct(
+    locationId,
+    companyProductId,
+    req.user
+  );
+
+  return res.status(201).json(locationProduct);
+};
+
+const deleteLocationProduct = async (req, res) => {
+  const { locationId, companyProductId } = req.params;
+
+  await locationService.deleteLocationProduct(
+    locationId,
+    companyProductId,
+    req.user
+  );
+
+  return res.status(204).send();
+};
+
 module.exports = {
   getLocations,
   getLocationById,
   createLocation,
   toggleLocation,
   updateLocation,
-  getLocationProducts
+  getLocationProducts,
+  getLocationProductsManage,
+  addLocationProduct,
+  deleteLocationProduct
 };
