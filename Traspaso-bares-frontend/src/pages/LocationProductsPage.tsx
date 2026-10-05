@@ -10,6 +10,10 @@ import { useAlerts } from "../hooks/alerts/useAlerts";
 import { AlertList } from "../components/ui/Alerts/AlertList";
 import { getApiError } from "../api/apiError";
 
+import SubcategoryFilter from "../components/ui/Filters/SubcategoryFilter";
+import SearchBar from "../components/ui/Filters/SearchBar";
+import { SUBCATEGORY_OPTIONS } from "../constants/productOptions";
+
 type Filter = "all" | "assigned" | "unassigned";
 
 export default function LocationProductsPage() {
@@ -94,9 +98,14 @@ export default function LocationProductsPage() {
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
+  const [activeSubcategory, setActiveSubcategory] = useState("all");
 
   const filteredProducts = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
+
+    const activeFilter = SUBCATEGORY_OPTIONS.find(
+      (option) => option.key === activeSubcategory
+    );
 
     return products.filter((product) => {
       const matchesSearch =
@@ -108,9 +117,22 @@ export default function LocationProductsPage() {
         (filter === "assigned" && product.assigned) ||
         (filter === "unassigned" && !product.assigned);
 
-      return matchesSearch && matchesFilter;
+      const matchesSubcategory =
+        activeSubcategory === "all" ||
+        activeFilter?.subcategories.includes(product.subcategory);
+
+      return (
+        matchesSearch &&
+        matchesFilter &&
+        matchesSubcategory
+      );
     });
-  }, [products, search, filter]);
+  }, [
+    products,
+    search,
+    filter,
+    activeSubcategory,
+  ]);
 
   const assignedCount = products.filter(
     (product) => product.assigned
@@ -147,41 +169,17 @@ export default function LocationProductsPage() {
 
       {/* PANEL */}
       <div className="rounded-3xl bg-white-soft p-6 shadow-sm">
-        {/* SEARCH + FILTER */}
-        <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        {/* SEARCH + STATUS FILTER */}
+        <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          {/* SEARCH */}
           <div className="w-full lg:max-w-md">
-            <label
-              htmlFor="product-search"
-              className="mb-2 block text-sm font-medium text-dark"
-            >
-              Buscar producto
-            </label>
-
-            <input
-              id="product-search"
-              type="text"
+            <SearchBar
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar por nombre..."
-              className="
-                w-full
-                rounded-xl
-                border
-                border-gray-light
-                bg-white
-                px-4
-                py-3
-                text-sm
-                text-dark
-                outline-none
-                transition
-                focus:border-primary
-                focus:ring-2
-                focus:ring-primary/20
-              "
+              onChange={setSearch}
             />
           </div>
 
+          {/* STATUS FILTER */}
           <div>
             <span className="mb-2 block text-sm font-medium text-dark">
               Mostrar
@@ -196,9 +194,7 @@ export default function LocationProductsPage() {
                 <button
                   key={option.value}
                   type="button"
-                  onClick={() =>
-                    setFilter(option.value as Filter)
-                  }
+                  onClick={() => setFilter(option.value as Filter)}
                   className={`
                     rounded-lg
                     px-4
@@ -217,6 +213,17 @@ export default function LocationProductsPage() {
                 </button>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* SUBCATEGORY FILTER */}
+        <div className="mb-6 -mx-1 overflow-x-auto pb-1 scrollbar-hide">
+          <div className="min-w-max mt-2 px-1">
+            <SubcategoryFilter
+              options={SUBCATEGORY_OPTIONS}
+              value={activeSubcategory}
+              onChange={setActiveSubcategory}
+            />
           </div>
         </div>
 
