@@ -24,7 +24,17 @@ const createProduct = async (req, res) => {
   });
 };
 
+const getCompanyProducts = async (req, res) => {
+  const companyId = req.user.companyId;
+
+  const companyProducts =
+    await productService.getCompanyProducts(companyId);
+
+  return res.status(200).json(companyProducts);
+};
+
 module.exports = {
   getAdminProducts,
-  createProduct
+  createProduct,
+  getCompanyProducts
 };
