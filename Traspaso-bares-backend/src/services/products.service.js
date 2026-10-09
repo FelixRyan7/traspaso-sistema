@@ -101,7 +101,23 @@ const createProduct = async (data, companyId) => {
   });
 };
 
+const getCompanyProducts = async (companyId) => {
+  return await CompanyProduct.findAll({
+    where: {
+      companyId,
+    },
+    include: [
+      {
+        model: Product,
+        as: "product",
+      },
+    ],
+    order: [["createdAt", "DESC"]],
+  });
+};
+
 module.exports = {
   getAdminProducts,
-  createProduct
+  createProduct,
+  getCompanyProducts
 };
