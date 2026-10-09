@@ -95,8 +95,6 @@ export default function LocationDirectDeliverPage() {
         </p>
       </div>
 
-      
-
       {/* SEARCH */}
       <SearchBar
         value={search}

@@ -1,12 +1,14 @@
 import { useMemo, useState } from "react";
-import { useAdminProducts } from "../hooks/useAdminProducts";
+import { useCompanyProducts } from "../hooks/useAdminProducts";
 import { DataTable } from "../components/ui/Tables/dataTable";
-import type { Product } from "../hooks/useAdminProducts";
+import type { CompanyProduct } from "../hooks/useAdminProducts";
 import type { Column } from "../types/table";
 import ProductModalForm from "../components/forms/ProductForm";
 
 import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
 import { useCreateProduct } from "../hooks/useCreateProduct";
 import { AlertList, type AlertMessage } from "../components/ui/Alerts/AlertList";
@@ -14,36 +16,98 @@ import { getApiError } from "../api/apiError";
 import type { ProductFormData } from "../schemas/createProduct.schema";
 import { useLocations } from "../hooks/PosHooks/useLocations";
 import { ErrorState } from "../components/ui/Alerts/ErrorState";
-import { formatCategory } from "../helpers/formatCategory";
-import { formatSubcategory } from "../helpers/formatSubcategory";
 import { formatUnitType } from "../helpers/formatUnitType";
 import { formatQuantity } from "../helpers/formatQuantity";
 
+import PowerSettingsNewOutlinedIcon from "@mui/icons-material/PowerSettingsNewOutlined";
+import PowerOffOutlinedIcon from "@mui/icons-material/PowerOffOutlined";
+
 export default function Products() {
   const { data: locations = [], error: locationsError } = useLocations();
-  const { data: products,  error: productsError } = useAdminProducts();
+  const { data: products = [],  error: productsError } = useCompanyProducts();
  
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [alerts, setAlerts] = useState<AlertMessage[]>([]);
 
-  const columns: Column<Product>[] = [
-    { key: "name", header: "Producto" },
-    { key: "unitType", header: "Unidad", render: (value) => formatUnitType(value as string)},
+  const columns: Column<CompanyProduct>[] = [
     {
-      key: "quantity",
-      header: "Cantidad",
-      render: (_, row) => formatQuantity(row.quantity, row.quantityUnit),
+      key: "product",
+      header: "Producto",
+      render: (_, row) => (
+        <div>
+          <p className="font-semibold text-dark">
+            {row.product.name}
+          </p>
+
+          {row.product.subcategory && (
+            <p className="text-xs text-gray-dark">
+              {row.product.subcategory}
+            </p>
+          )}
+        </div>
+      ),
     },
-    { key: "category", header: "Categoría", render: (value) => formatCategory(value as string), },
-    { key: "subcategory", header: "Subcategoría", render: (value) => formatSubcategory(value as string), },
+    {
+      key: "unitType",
+      header: "Formato",
+      render: (_, row) =>
+        `${formatUnitType(row.product.unitType)} · ${formatQuantity(
+          row.product.quantity,
+          row.product.quantityUnit
+        )}`,
+    },
+    {
+      key: "operationalArea",
+      header: "Área",
+      render: (value) =>
+        value === "bar" ? "Bar" : "Cocina",
+    },
+    {
+      key: "isActive",
+      header: "Estado",
+      render: (value) => (
+        <span
+          className={
+            value
+              ? "rounded-full bg-success-soft px-3 py-1 text-xs font-medium text-success"
+              : "rounded-full bg-error-soft px-3 py-1 text-xs font-medium text-error"
+          }
+        >
+          {value ? "Activo" : "Inactivo"}
+        </span>
+      ),
+    },
+    {
+  key: "actions",
+  header: "Acciones",
+  render: (_, row) => (
+    <div className="flex items-center gap-2">
+      <button
+        type="button"
+        onClick={() => console.log("editar", row)}
+        className="rounded-md px-2 py-1 text-sm font-medium text-primary bg-primary-soft hover:bg-primary hover:text-white"
+      >
+        <EditOutlinedIcon />
+      </button>
+
+      <button
+        type="button"
+       
+        className="rounded-md px-3 py-1 text-sm font-medium text-white bg-error hover:bg-error-strong hover:text-white"
+      >
+        {row.isActive ? "Desactivar" : "Activar"}
+      </button>
+    </div>
+  ),
+},
   ];
 
   const filteredData = useMemo(() => {
-    if (!products?.products) return [];
-
-    return products.products.filter((p: any) =>
-      p.name.toLowerCase().includes(search.toLowerCase())
+    return products?.filter((product) =>
+      product.product.name
+        .toLowerCase()
+        .includes(search.toLowerCase())
     );
   }, [products, search]);
 
