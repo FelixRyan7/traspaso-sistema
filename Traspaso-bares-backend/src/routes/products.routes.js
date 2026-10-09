@@ -24,4 +24,11 @@ router.post(
   asyncHandler(productController.createProduct)
 );
 
+router.get(
+  "/company-products",
+  authMiddleware,
+  requireRoles("admin", "manager"),
+  asyncHandler(productController.getCompanyProducts)
+);
+
 module.exports = router;
