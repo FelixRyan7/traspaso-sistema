@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { useWorkspaceLocation } from "../hooks/PosHooks/useLocation";
 
 import { ErrorState } from "../components/ui/Alerts/ErrorState";
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 import { useLocationProductsManage, useAddLocationProduct, type LocationProductManageItem, useDeleteLocationProduct } from "../hooks/PosHooks/useLocationProducts";
 import { useAlerts } from "../hooks/alerts/useAlerts";
@@ -22,18 +23,13 @@ export default function LocationProductsPage() {
   const id = Number(locationId);
 
   const {
-  data: products = [],
-  isLoading,
-  error,
-} = useLocationProductsManage(id);
-
-
+    data: products = [],
+    isLoading,
+    error,
+  } = useLocationProductsManage(id);
 
   const { data: location } = useWorkspaceLocation(id);
-
-  const [recentlyAssignedId, setRecentlyAssignedId] = useState<number | null>(
-  null
-);
+  const [recentlyAssignedId, setRecentlyAssignedId] = useState<number | null>(null);
 
   const {
     alerts,
@@ -54,47 +50,47 @@ export default function LocationProductsPage() {
   const isUpdating = isAdding || isDeleting;
 
   const handleToggleProduct = async (
-  product: LocationProductManageItem
-) => {
-  try {
-    if (product.assigned) {
-      await deleteLocationProduct({
-        locationId: id,
-        companyProductId: product.companyProductId,
-      });
+    product: LocationProductManageItem
+  ) => {
+    try {
+      if (product.assigned) {
+        await deleteLocationProduct({
+          locationId: id,
+          companyProductId: product.companyProductId,
+        });
+
+        pushAlert({
+          type: "success",
+          content: "Producto Eliminado correctamente.",
+        });
+      } else {
+        await addLocationProduct({
+          locationId: id,
+          companyProductId: product.companyProductId,
+        });
+
+        setRecentlyAssignedId(product.companyProductId);
+
+        setTimeout(() => {
+          setRecentlyAssignedId(null);
+        }, 1000);
+
+        pushAlert({
+          type: "success",
+          content: "Producto asignado correctamente.",
+        });
+      }
+    } catch (error) {
+      console.error("Error actualizando producto", error);
+
+      const apiError = getApiError(error);
 
       pushAlert({
-        type: "success",
-        content: "Producto Eliminado correctamente.",
-      });
-    } else {
-      await addLocationProduct({
-        locationId: id,
-        companyProductId: product.companyProductId,
-      });
-
-      setRecentlyAssignedId(product.companyProductId);
-
-      setTimeout(() => {
-        setRecentlyAssignedId(null);
-      }, 1000);
-
-      pushAlert({
-        type: "success",
-        content: "Producto asignado correctamente.",
+        type: "error",
+        content: apiError.message,
       });
     }
-  } catch (error) {
-    console.error("Error actualizando producto", error);
-
-    const apiError = getApiError(error);
-
-    pushAlert({
-      type: "error",
-      content: apiError.message,
-    });
-  }
-};
+  };
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
@@ -289,15 +285,22 @@ export default function LocationProductsPage() {
                     />                
 
                     <div>
-                      <p className="text-sm font-semibold text-dark">
-                        {product.name}
-                      </p>
+                      
+                        <p className="text-sm font-semibold text-dark">
+                          {product.name}
+                        </p>       
 
                       <p className="mt-0.5 text-xs text-gray-dark">
                         {product.category}
                         {product.subcategory &&
                           ` · ${product.subcategory}`}
                       </p>
+                      {!product.isActive && product.assigned && (
+                          <p className="flex items-center text-xs text-gray-dark gap-1">
+                            Actualmente desactivado de forma general.
+                            <InfoOutlinedIcon sx={{ fontSize: 17 }} />
+                          </p>
+                        )}
                     </div>
                   </div>
 
