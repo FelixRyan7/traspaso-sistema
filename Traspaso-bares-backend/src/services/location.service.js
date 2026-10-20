@@ -248,6 +248,7 @@ const getLocationProductsManage = async (locationId, user) => {
   return companyProducts.map((companyProduct) => ({
     productId: companyProduct.product.id,
     companyProductId: companyProduct.id,
+    isActive: companyProduct.isActive,
     name: companyProduct.product.name,
     brand: companyProduct.product.brand,
     category: companyProduct.product.category,
