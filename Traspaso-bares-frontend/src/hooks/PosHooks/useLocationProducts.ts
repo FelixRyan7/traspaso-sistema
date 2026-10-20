@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 export type LocationProductManageItem = {
   productId: number;
   companyProductId: number;
+  isActive: boolean;
   name: string;
   brand?: string | null;
   category: string;

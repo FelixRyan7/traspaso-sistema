@@ -24,4 +24,26 @@ router.post(
   asyncHandler(productController.createProduct)
 );
 
+router.get(
+  "/company-products",
+  authMiddleware,
+  requireRoles("admin", "manager"),
+  asyncHandler(productController.getCompanyProducts)
+);
+
+router.patch(
+  "/company-products/:companyProductId/toggle",
+  authMiddleware,
+  requireRoles("admin", "manager"),
+  asyncHandler(productController.toggleCompanyProduct)
+);
+
+router.patch(
+  "/company-products/:companyProductId",
+  authMiddleware,
+  requireRoles("admin", "manager"),
+  asyncHandler(productController.updateCompanyProduct)
+);
+
+
 module.exports = router;

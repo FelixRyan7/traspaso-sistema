@@ -131,12 +131,19 @@ const toggleLocation = async (locationId, authUser) => {
 
 const getLocationProducts = async (locationId, user) => {
   const locationProducts = await LocationProduct.findAll({
-    where: { locationId },
+    where:
+    { 
+      locationId,
+      isActive: true,
+    },
     include: [
       {
         model: CompanyProduct,
         as: "companyProduct",
         required: true,
+        where: {
+          isActive: true,
+        },
         include: [
           {
             model: Product,
@@ -229,18 +236,19 @@ const getLocationProductsManage = async (locationId, user) => {
     where: {
       locationId,
     },
-    attributes: ["companyProductId"],
+    attributes: ["companyProductId", "isActive"],
   });
 
   const assignedCompanyProductIds = new Set(
-    locationProducts.map(
-      (locationProduct) => locationProduct.companyProductId
-    )
+    locationProducts
+      .filter((locationProduct) => locationProduct.isActive)
+      .map((locationProduct) => locationProduct.companyProductId)
   );
 
   return companyProducts.map((companyProduct) => ({
     productId: companyProduct.product.id,
     companyProductId: companyProduct.id,
+    isActive: companyProduct.isActive,
     name: companyProduct.product.name,
     brand: companyProduct.product.brand,
     category: companyProduct.product.category,
@@ -289,6 +297,14 @@ const addLocationProduct = async (
     );
   }
 
+  if (!companyProduct.isActive) {
+    throw new AppError(
+      "El producto está desactivado para esta empresa",
+      "COMPANY_PRODUCT_INACTIVE",
+      409
+    );
+  }
+
   const existing = await LocationProduct.findOne({
     where: {
       locationId,
@@ -297,11 +313,19 @@ const addLocationProduct = async (
   });
 
   if (existing) {
-    throw new AppError(
-      "El producto ya está asignado a esta ubicación",
-      "LOCATION_PRODUCT_ALREADY_EXISTS",
-      409
-    );
+    if (existing.isActive) {
+      throw new AppError(
+        "El producto ya está asignado a esta ubicación",
+        "LOCATION_PRODUCT_ALREADY_EXISTS",
+        409
+      );
+    }
+
+    existing.isActive = true;
+
+    await existing.save();
+
+    return existing;
   }
 
   const locationProduct = await LocationProduct.create({
@@ -365,7 +389,9 @@ const deleteLocationProduct = async (
     );
   }
 
-  await locationProduct.destroy();
+  locationProduct.isActive = false;
+
+  await locationProduct.save();
 };
 
 module.exports = {
