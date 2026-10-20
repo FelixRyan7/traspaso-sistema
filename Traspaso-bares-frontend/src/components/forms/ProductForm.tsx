@@ -66,7 +66,7 @@ export default function ProductModalForm({
           Crear Producto
         </h2>
       </div>
-      <form onSubmit={handleSubmit(internalSubmit)} className="overflow-y-auto pr-2 scroll-area pb-6">
+      <form onSubmit={handleSubmit(internalSubmit)} className="overflow-y-auto pr-2 scroll-area py-6">
         
           {/* NAME */}
           <InputFloatingRHF
