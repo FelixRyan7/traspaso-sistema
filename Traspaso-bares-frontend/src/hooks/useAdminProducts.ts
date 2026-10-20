@@ -1,7 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, } from "@tanstack/react-query";
 import api from "../api/axios";
 import { AxiosError } from "axios";
 import type { ApiError } from "../types/api";
+import type { EditCompanyProductFormData } from "../schemas/editCompanyProduct.schema";
 
 export type Product = {
   id: number;
@@ -77,6 +78,61 @@ export const useCompanyProducts = () => {
       );
 
       return res.data;
+    },
+  });
+};
+
+export const useToggleCompanyProduct = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    { success: boolean; data: CompanyProduct },
+    AxiosError<ApiError>,
+    number
+  >({
+    mutationFn: async (companyProductId) => {
+      const res = await api.patch<{
+        success: boolean;
+        data: CompanyProduct;
+      }>(
+        `admin/products/company-products/${companyProductId}/toggle`
+      );
+
+      return res.data;
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["company-products"],
+      });
+    },
+  });
+};
+
+export const useUpdateCompanyProduct = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    { success: boolean; data: CompanyProduct },
+    AxiosError<ApiError>,
+    { companyProductId: number; data: EditCompanyProductFormData }
+  >({
+    mutationFn: async ({ companyProductId, data }) => {
+      const res = await api.patch<{
+        success: boolean;
+        data: CompanyProduct;
+      }>(
+        `/admin/products/company-products/${companyProductId}`,
+        data
+      );
+
+      return res.data;
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["company-products"],
+      });
     },
   });
 };
