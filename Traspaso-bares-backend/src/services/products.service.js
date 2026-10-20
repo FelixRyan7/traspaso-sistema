@@ -116,8 +116,111 @@ const getCompanyProducts = async (companyId) => {
   });
 };
 
+const toggleCompanyProduct = async ( companyProductId, companyId ) => { 
+  const companyProduct = 
+    await CompanyProduct.findOne({ where: { id: companyProductId, companyId, }, }); 
+  
+    if (!companyProduct) { 
+      throw new AppError
+      ( "El producto no pertenece a tu empresa", "COMPANY_PRODUCT_NOT_FOUND", 404 ); 
+    } 
+
+    companyProduct.isActive = !companyProduct.isActive; 
+    await companyProduct.save(); 
+    
+  return companyProduct; 
+};
+
+const updateCompanyProduct = async (
+  companyProductId,
+  companyId,
+  data
+) => {
+  const companyProduct = await CompanyProduct.findOne({
+    where: {
+      id: companyProductId,
+      companyId,
+    },
+  });
+
+  if (!companyProduct) {
+    throw new AppError(
+      "El producto no pertenece a tu empresa o no existe",
+      "COMPANY_PRODUCT_NOT_FOUND",
+      404
+    );
+  }
+
+  const { suggestedQuantity, inventoryUnit, operationalArea } = data;
+
+  const validInventoryUnits = [
+    "unit",
+    "kg",
+    "g",
+    "l",
+    "ml",
+  ];
+
+  const validOperationalAreas = ["bar", "kitchen"];
+
+  // Validar los campos obligatorios
+  if (
+    suggestedQuantity === undefined ||
+    inventoryUnit === undefined ||
+    operationalArea === undefined
+  ) {
+    throw new AppError(
+      "Debes proporcionar todos los campos de configuración",
+      "INVALID_COMPANY_PRODUCT_DATA",
+      400
+    );
+  }
+
+  // La cantidad sugerida puede ser null o un entero >= 1
+  if (
+    suggestedQuantity !== null &&
+    (!Number.isInteger(suggestedQuantity) || suggestedQuantity < 1)
+  ) {
+    throw new AppError(
+      "La cantidad sugerida debe ser un entero mayor que cero o null",
+      "INVALID_SUGGESTED_QUANTITY",
+      400
+    );
+  }
+
+  // La unidad de inventario puede ser null
+  if (
+    inventoryUnit !== null &&
+    !validInventoryUnits.includes(inventoryUnit)
+  ) {
+    throw new AppError(
+      "La unidad de inventario no es válida",
+      "INVALID_INVENTORY_UNIT",
+      400
+    );
+  }
+
+  if (!validOperationalAreas.includes(operationalArea)) {
+    throw new AppError(
+      "El área operativa debe ser bar o kitchen",
+      "INVALID_OPERATIONAL_AREA",
+      400
+    );
+  }
+
+  await companyProduct.update({
+    suggestedQuantity,
+    inventoryUnit,
+    operationalArea,
+  });
+
+  return companyProduct;
+};
+
 module.exports = {
   getAdminProducts,
   createProduct,
-  getCompanyProducts
+  getCompanyProducts,
+  toggleCompanyProduct,
+  updateCompanyProduct
 };
